@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Gửi dữ liệu Web - Server</title>
+</head>
+<body>
+    <h2>Tính tổng 2 số</h2>
+    <input type="number" id="soA" placeholder="Nhập số A">
+    <input type="number" id="soB" placeholder="Nhập số B">
+    <button onclick="guiDuLieuLienServer()">Tính Tổng</button>
+
+    <h3 id="ketQuaHienThi"></h3>
+
+    <script>
+        async function guiDuLieuLienServer() {
+            // 1. Lấy dữ liệu từ ô input
+            const soA = Number(document.getElementById('soA').value);
+            const soB = Number(document.getElementById('soB').value);
+
+            // Dữ liệu cần gửi
+            const duLieu = {
+                soA: soA,
+                soB: soB
+            };
+
+            try {
+                // 2. Gửi request lên Server bằng Fetch API
+                const response = await fetch('http://localhost:3000/api/tinh-tong', {
+                    method: 'POST', // Phương thức POST dùng để gửi dữ liệu
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(duLieu) // Chuyển đổi object thành chuỗi JSON
+                });
+
+                // 3. Nhận và xử lý kết quả từ Server
+                const data = await response.json(); // Đọc dữ liệu JSON trả về
+                
+                if (data.thanhCong) {
+                    document.getElementById('ketQuaHienThi').innerText = data.tinNhan;
+                }
+            } catch (error) {
+                console.error('Lỗi kết nối:', error);
+                document.getElementById('ketQuaHienThi').innerText = 'Lỗi kết nối đến server!';
+            }
+        }
+    </script>
+</body>
+</html>

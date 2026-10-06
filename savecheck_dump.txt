@@ -1,0 +1,49 @@
+async function saveCheck(){
+  const file=document.getElementById('cam').files[0] || document.getElementById('up').files[0];
+  if(!file){alert('Hãy chụp ảnh mới hoặc chọn một ảnh có sẵn trong điện thoại.');return;}
+  if(!selectedPos){closeCheck();pickingLocation=true;alert('Chưa có vị trí. Hãy bấm trực tiếp lên bản đồ để chọn vị trí ảnh.');return;}
+  const st=document.getElementById('aiStatus');
+  st.style.display='block'; st.style.background='#fffbeb'; st.style.color='#92400e'; st.textContent='⏳ Đang phân tích ảnh qua AI Adapter...';
+  
+  try {
+    const context = { latitude: selectedPos.lat, longitude: selectedPos.lng, location_source: selectedPos.source, age: document.getElementById('age').value };
+    const result = await analyzeRice(file, context);
+    
+    st.style.background='#f0fdf4'; st.style.color='#166534';
+    st.innerHTML='✅ <b>Phân tích hoàn tất (' + result.provider + ')</b><br>Bệnh: ' + result.disease + ' (' + (result.confidence*100).toFixed(0) + '%)<br>Vị trí: ' + selectedPos.lat.toFixed(6) + ', ' + selectedPos.lng.toFixed(6);
+    
+    
+    const record={f:'Vị trí mới',s: result.disease.includes('Không') ? 'green' : 'red', d: result.disease, id: result.id || null, c: (result.confidence*100).toFixed(0)+'%', a: document.getElementById('age').value||'—', g: 'Chưa rõ', t: new Date().toISOString(), lat: selectedPos.lat, lng: selectedPos.lng, job_id: result.job_id, location_source: selectedPos.source, provider: result.provider};
+    
+    // Save to Supabase
+    const { data: inserted, error: dbErr } = await supabase.from('inspections').insert({
+        field_name: record.f,
+        disease_id: record.id,
+        disease_name: record.d,
+        status_color: record.s,
+        confidence: record.c,
+        age_days: parseInt(record.a) || null,
+        growth_stage: record.g,
+        latitude: record.lat,
+        longitude: record.lng,
+        location_source: record.location_source,
+        ai_provider: record.provider,
+        job_id: record.job_id
+    }).select();
+    
+    if (inserted && inserted.length > 0) record.db_id = inserted[0].id;
+    
+    data.unshift(record);
+    render();
+
+    
+    setTimeout(() => {
+      closeCheck();
+      alert('Đã lưu bản ghi nhật ký. Nguồn AI: ' + result.provider);
+      st.style.display='none';
+    }, 1500);
+  } catch(err) {
+    st.style.background='#fef2f2'; st.style.color='#991b1b';
+    st.textContent='❌ Lỗi: '+err.message;
+  }
+}

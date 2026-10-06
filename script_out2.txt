@@ -1,0 +1,2 @@
+
+<div class="app"><aside class="side"><div class="head"><div class="brand">🌾 AI Rice</div><div class="sub">Bản đồ sức khỏe ruộng lúa</div><div class="search"><input id="q" placeholder="🔍 Tìm ruộng, bệnh..." oninput="render()"><button class="icon" onclick="document.querySelector('.app').classList.toggle('hide-map')" title="Ẩn/Hiện bản đồ" style="width:auto;padding:0 10px;font-weight:600;font-size:12px;display:flex;align-items:center;gap:4px">🗺️ Map</button><button class="icon" onclick="openS

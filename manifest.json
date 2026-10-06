@@ -1,0 +1,15 @@
+{
+  "name": "CAY LÚA AI",
+  "short_name": "CayLua",
+  "start_url": "./AI_Rice_UX_Prototype_V3_CLICK_POPUP_FINAL.html",
+  "display": "standalone",
+  "background_color": "#f4f7f5",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSI4MCIgZm9udC1zaXplPSI4MCI+8J+WhyA8L3RleHQ+PC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

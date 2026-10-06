@@ -1,0 +1,21 @@
+const cayluaProvider = {
+    name: "caylua-yolov8",
+    async healthCheck() {
+        try {
+            let res = await fetch(CAYLUA_CONFIG.server.baseUrl + CAYLUA_CONFIG.server.healthPath, { signal: AbortSignal.timeout(CAYLUA_CONFIG.server.timeoutMs) });
+            return res.ok;
+        } catch(e) { return false; }
+    },
+    async analyze(file, context) {
+        const fd = new FormData();
+        fd.append('file', file, file.name);
+        fd.append('latitude', String(context.latitude));
+        fd.append('longitude', String(context.longitude));
+        fd.append('location_source', context.location_source);
+        let res = await fetch(CAYLUA_CONFIG.server.baseUrl + CAYLUA_CONFIG.server.analyzePath, { method: 'POST', body: fd, signal: AbortSignal.timeout(CAYLUA_CONFIG.server.timeoutMs) });
+        if(!res.ok) throw new Error('Server error');
+        let data = await res.json();
+        const disease = (data.diseases && data.diseases.length) ? data.diseases.map(x=>x.name||x.label||x).join(', ') : 'Không phát hiện';
+        return { status: "success", provider: "caylua-yolov8", disease: disease, confidence: 0.9, job_id: data.job_id };
+    }
+};

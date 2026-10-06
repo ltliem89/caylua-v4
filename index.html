@@ -1,0 +1,1139 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="./manifest.json">
+<title>AI Rice UX Prototype V3</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:system-ui,Arial;background:#f4f7f5;color:#17202a}button,input,select{font:inherit}button{cursor:pointer}.app{height:100%;display:grid;grid-template-columns:330px 1fr}.side{background:#fff;border-right:1px solid #ddd;display:flex;flex-direction:column}.head{padding:15px;border-bottom:1px solid #eee}.brand{font-size:19px;font-weight:800}.sub{font-size:11px;color:#667085}.search{display:flex;gap:6px;margin-top:10px}.search input{flex:1;padding:9px;border:1px solid #d0d5dd;border-radius:9px}.icon{width:40px;border:1px solid #d0d5dd;background:#fff;border-radius:9px}.tabs{display:flex;gap:5px;padding:9px}.tab{flex:1;border:0;border-radius:9px;padding:8px;background:#f1f4f2;font-size:11px}.tab.active{background:#dcfce7;color:#166534;font-weight:700}.list{overflow:auto;padding:0 10px}.day{font-size:10px;font-weight:700;color:#667085;padding:8px 2px 5px}.item{display:grid;grid-template-columns:45px 1fr auto auto;align-items:center;gap:8px;padding:8px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:6px;cursor:pointer}.thumb{width:45px;height:45px;border-radius:7px;object-fit:cover;background:#eee}.title{font-size:11px;font-weight:750}.meta{font-size:9px;color:#667085;line-height:1.45}.badge{font-size:9px;padding:4px 6px;border-radius:20px;height:max-content}.green{background:#dcfce7;color:#166534}.yellow{background:#fef3c7;color:#92400e}.red{background:#fee2e2;color:#991b1b}.gray{background:#f1f5f9;color:#475569}.main{position:relative;min-width:0}.map{height:100%}.tools{position:absolute;z-index:1000;right:12px;top:12px;display:flex;gap:5px}.tools button{background:#fff;border:1px solid #ddd;border-radius:9px;padding:8px;font-size:11px;box-shadow:0 2px 10px #0002}.legend{position:absolute;z-index:1000;left:12px;bottom:15px;background:#fff;padding:8px;border-radius:9px;box-shadow:0 2px 10px #0002;font-size:9px;line-height:1.8}.action{position:absolute;z-index:1000;left:50%;bottom:20px;transform:translateX(-50%);border:0;border-radius:12px;background:#16a34a;color:#fff;padding:11px 18px;font-weight:800;box-shadow:0 4px 16px #0003}.panel{position:absolute;z-index:2000;right:16px;top:16px;width:350px;max-height:calc(100% - 32px);overflow:auto;background:#fff;border-radius:15px;box-shadow:0 8px 30px #0003;display:none}.panel.show{display:block}.phead{padding:12px 14px;border-bottom:1px solid #eee;display:flex;justify-content:space-between}.close{border:0;background:#f1f3f2;border-radius:8px;width:30px;height:30px}.pbody{padding:14px}.hero{width:100%;height:175px;object-fit:cover;border-radius:10px}.big{font-size:17px;font-weight:800;margin-top:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.info{background:#f7f9f8;padding:9px;border-radius:9px}.info b{display:block;font-size:11px}.info span{font-size:9px;color:#667085}.wide{width:100%;border:0;border-radius:9px;padding:9px;margin-top:7px;background:#eef2f0}.primary{background:#16a34a;color:white}.modal,.settings{position:fixed;inset:0;background:#0005;z-index:3000;display:none;align-items:flex-end;justify-content:center}.modal.show,.settings.show{display:flex}.sheet,.setbox{background:#fff;width:min(560px,100%);max-height:90dvh;overflow:auto;border-radius:18px 18px 0 0;padding:17px}.setbox{border-radius:16px;margin:auto}.choice{display:grid;grid-template-columns:1fr 1fr;gap:7px}.choice button{padding:14px;text-align:left;border:1px solid #ddd;background:#fff;border-radius:10px}.field{margin-top:9px}.field label{font-size:10px;color:#475467;display:block;margin-bottom:3px}.field input,.field select{width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:8px}.save{width:100%;margin-top:11px;padding:10px;border:0;border-radius:9px;background:#16a34a;color:#fff;font-weight:800}.setrow{padding:12px 0;border-bottom:1px solid #eee}.setrow b{font-size:12px}.setrow p{font-size:10px;color:#667085}.setrow input{width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:8px}
+@media(max-width:850px){.app{display:block}.main{height:100dvh}.side{position:absolute;z-index:10;bottom:0;left:0;right:0;height:38dvh;border:0;border-top:1px solid #ddd;border-radius:15px 15px 0 0;box-shadow:0 -3px 18px #0002}.action{bottom:39dvh}.legend{bottom:39dvh}.panel{left:8px;right:8px;bottom:38dvh;top:auto;width:auto;max-height:62dvh}}
+
+.kcard{border:1px solid #e5e7eb;border-radius:11px;padding:10px;margin:7px 0;background:#fff;cursor:pointer}
+.kcard b{font-size:11px}.kmeta{font-size:9px;color:#667085;margin-top:3px}.kgroup{font-size:8px;padding:3px 6px;border-radius:99px;background:#eef2ff;color:#3730a3;display:inline-block}
+.rec{margin-top:9px;background:#f0fdf4;border-left:4px solid #16a34a;padding:9px;border-radius:7px;font-size:10px;line-height:1.5}
+.warn{margin-top:9px;background:#fffbeb;border-left:4px solid #eab308;padding:9px;border-radius:7px;font-size:10px;line-height:1.5}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.pill{font-size:8px;background:#f1f5f9;padding:4px 6px;border-radius:99px;color:#475569}
+.dataStat{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.dataStat .info{min-height:58px}
+.app.hide-map{grid-template-columns:1fr}.app.hide-map .main{display:none}
+@media(max-width:850px){.app.hide-map .side{position:relative;height:100dvh;border-radius:0;border-top:0;box-shadow:none}}
+
+/* Chế độ Nắng Chói Ngoài Trời (High-Contrast Sunlight Mode) */
+body.sun-mode {
+  background: #000 !important;
+  color: #fff !important;
+}
+body.sun-mode .app {
+  background: #000 !important;
+}
+body.sun-mode .side, body.sun-mode .sheet, body.sun-mode .panel, body.sun-mode .setbox {
+  background: #050505 !important;
+  color: #ffffff !important;
+  border: 3px solid #facc15 !important;
+}
+body.sun-mode .item, body.sun-mode .info, body.sun-mode .kcard {
+  background: #18181b !important;
+  color: #ffffff !important;
+  border: 2px solid #a1a1aa !important;
+}
+body.sun-mode .title, body.sun-mode .big, body.sun-mode b {
+  color: #fde047 !important;
+  font-weight: 900 !important;
+}
+body.sun-mode .meta, body.sun-mode .sub, body.sun-mode small {
+  color: #e4e4e7 !important;
+}
+body.sun-mode button {
+  border: 2px solid #facc15 !important;
+  font-weight: 800 !important;
+}
+body.sun-mode .primary, body.sun-mode .action, body.sun-mode .save {
+  background: #facc15 !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+body.sun-mode .tab.active {
+  background: #facc15 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}
+body.sun-mode .rec {
+  background: #064e3b !important;
+  color: #a7f3d0 !important;
+  border-left: 6px solid #34d399 !important;
+}
+body.sun-mode .warn {
+  background: #78350f !important;
+  color: #fef08a !important;
+  border-left: 6px solid #fbbf24 !important;
+}
+
+</style>
+<style id="accessibility-font-style">
+:root{
+  --ui-scale:1;
+  --base-font:16px;
+}
+html{font-size:var(--base-font)}
+body{font-size:var(--base-font)}
+body,.item,.meta,.title,.info,.info b,.info span,.kcard,.kmeta,.kgroup,.rec,.warn,.pill,
+button,input,select,textarea{font-size:calc(1em * var(--ui-scale))}
+.title{font-size:calc(1.05em * var(--ui-scale))}
+.big{font-size:calc(1.45em * var(--ui-scale))}
+.font-control{
+  display:flex;align-items:center;gap:5px;margin-left:6px;
+  background:#fff;border:1px solid #d9dee7;border-radius:9px;padding:3px 5px;
+}
+.font-control button{
+  width:30px;height:30px;border:0;border-radius:7px;background:#f3f5f7;
+  cursor:pointer;font-weight:700;line-height:1;
+}
+.font-control button:hover{background:#e7ebef}
+.font-size-label{min-width:40px;text-align:center;font-size:10px!important;color:#475569}
+@media(max-width:760px){
+  .font-control{position:fixed;right:10px;bottom:76px;z-index:1001;box-shadow:0 3px 12px #0002}
+  .font-control button{width:34px;height:34px}
+}
+</style>
+</head><body>
+<div class="app"><aside class="side"><div class="head"><div class="brand">🌾 AI Rice</div><div class="sub">Bản đồ sức khỏe ruộng lúa</div>
+<div id="sysStatus" style="display:flex; gap:5px; flex-wrap:wrap; font-size:9px; margin-top:6px; padding-bottom:5px; border-bottom:1px solid #eee;">
+    <span id="stApp" class="pill" style="background:#dcfce7;color:#166534">🟢 APP</span>
+    <span id="stGps" class="pill" style="background:#f1f5f9">⚪ GPS</span>
+    <span id="stAi" class="pill" style="background:#f1f5f9">⚪ AI</span>
+    <span id="stCloud" class="pill" style="background:#f1f5f9">⚪ CLOUD</span>
+    <span id="stSync" class="pill" style="background:#dcfce7;color:#166534">🟢 SYNC</span>
+</div><div class="search"><input id="q" placeholder="🔍 Tìm ruộng, bệnh..." oninput="render()"><button class="icon" onclick="document.querySelector('.app').classList.toggle('hide-map')" title="Ẩn/Hiện bản đồ" style="width:auto;padding:0 10px;font-weight:600;font-size:12px;display:flex;align-items:center;gap:4px">🗺️ Map</button><button class="icon" onclick="openSet()" title="Cài đặt">⚙️</button></div></div><div class="tabs">
+<button class="tab active" onclick="tab(this,'recent')">📋 Nhật ký</button>
+<button class="tab" onclick="tab(this,'tasks')">🎯 Việc cần làm</button>
+<button class="tab" onclick="tab(this,'overview')">📊 Phân tích</button>
+<button class="tab" onclick="tab(this,'knowledge')">📚 Kiến thức</button>
+<button class="tab" onclick="tab(this,'data')">🗄️ Dữ liệu</button>
+</div><div id="list" class="list"></div></aside>
+<main class="main"><div id="map" class="map"></div><div class="tools"><button id="btnSunMode" onclick="toggleSunMode()" title="Chế độ Nắng Chói Ngoài Đồng">☀️ Nắng Chói</button><button id="btnWindRadar" onclick="toggleWindRadar()" title="Radar Gió & Dịch Tễ Lây Lan">💨 Gió & Dịch</button><button id="btnFollow" onclick="followMe()" title="Tự động bám theo vị trí" style="background:#dcfce7">🎯</button><button onclick="testServer()" title="Kiểm tra kết nối Server" style="background:#fef08a">📡</button><button onclick="startTractorSim()" title="Chạy mô phỏng xe">🚜</button><button onclick="road()">🛣️</button><button onclick="sat()">🛰️</button><button onclick="locate()">📍</button></div><div class="legend">🟢 Bình thường &nbsp; 🟡 Theo dõi &nbsp; 🔴 Có vấn đề &nbsp; ⚪ Chưa phân tích</div><button class="action" onclick="openCheck()">📷 Kiểm tra ruộng</button><div id="panel" class="panel"><div class="phead"><b id="pt">Chi tiết</b><button class="close" onclick="closePanel()">✕</button></div><div id="pb" class="pbody"></div></div></main></div>
+<div id="modal" class="modal"><div class="sheet"><h3>📷 Tạo lần kiểm tra</h3><div class="choice"><button onclick="document.getElementById('cam').click()">📷<br><b>Chụp ảnh mới</b><br><small>Camera điện thoại</small></button><button onclick="document.getElementById('up').click()">📁<br><b>Chọn ảnh điện thoại</b><br><small>Ảnh đã chụp trước đó</small></button></div><input id="cam" type="file" accept="image/*" capture="environment" hidden onchange="preview(this)"><input id="up" type="file" accept="image/*" hidden onchange="preview(this)"><img id="prev" style="display:none;width:100%;height:160px;object-fit:cover;border-radius:9px;margin-top:8px"><div class="field"><label>📍 Vị trí</label><button class="wide" onclick="pick()">Bấm bản đồ để chọn vị trí</button><div id="pos" class="meta">Chưa chọn</div></div><div class="field"><label>🌾 Vụ</label><input value="Đông Xuân"></div><div class="field"><label>📅 Ngày gieo</label><input id="sow" type="date" value="2026-08-01" onchange="updateCropStageFromDate()"></div><div class="grid" style="grid-template-columns:1fr 1fr;gap:6px"><div class="field"><label>🌱 Tuổi lúa (tự tính)</label><input id="age" readonly style="font-weight:700"></div><div class="field"><label>🌿 Giai đoạn (tự chọn)</label><select id="stageSelect"><option>Mạ</option><option>Đẻ nhánh</option><option>Làm đòng</option><option>Trổ</option><option>Chín sữa</option><option>Chín</option></select></div></div><div class="field"><label>📝 Ghi chú / Triệu chứng bệnh</label><div style="display:flex;gap:6px"><input id="noteInput" placeholder="Ví dụ: đốm mắt én ở lá, khô chóp..." style="flex:1"><button type="button" id="btnVoiceInput" onclick="startVoiceInput()" style="background:#2563eb;color:#fff;border:0;border-radius:8px;padding:0 12px;font-size:12px;font-weight:700" title="Bấm nói tiếng Việt">🎙️ Nói</button></div><div id="voiceStatus" style="display:none;margin-top:6px;padding:7px;border-radius:7px;background:#f0fdf4;font-size:10px;line-height:1.4"></div></div><div id="aiStatus" style="display:none;margin-top:9px;padding:9px;border-radius:9px;background:#f8fafc;font-size:11px"></div><button class="save" onclick="saveCheck()">🤖 Gửi ảnh cho AI & lưu kiểm tra</button><button class="wide" onclick="closeCheck()">Hủy</button></div></div>
+<div id="settings" class="settings"><div class="setbox"><div class="phead"><b>⚙️ Cài đặt</b><button class="close" onclick="closeSet()">✕</button></div><div class="pbody">
+  <div class="setrow">
+    <b>🤖 Chế độ AI (AI Mode)</b>
+    <p>Chọn nguồn xử lý ảnh. AUTO sẽ ưu tiên Server, lỗi sẽ dùng PlantNet, lỗi tiếp sẽ giả lập.</p>
+    <select id="setAiMode" onchange="CAYLUA_CONFIG.aiMode=this.value" style="width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:8px;margin-top:5px">
+      <option value="auto">AUTO (Tự động)</option>
+      <option value="server">Chỉ Server YOLOv8</option>
+      <option value="api">Chỉ PlantNet API</option>
+      <option value="local">Chỉ Giả lập (Local)</option>
+    </select>
+  </div>
+  <div class="setrow">
+    <b>🖥️ Server CAY LÚA</b>
+    <input id="setServerUrl" placeholder="URL (vd: http://localhost:8000)" oninput="CAYLUA_CONFIG.server.baseUrl=this.value" style="width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:8px;margin-top:5px;margin-bottom:5px">
+  </div>
+  <div class="setrow">
+    <b>🌍 API PlantNet</b>
+    <input id="setApiKey" placeholder="API Key" oninput="CAYLUA_CONFIG.plantnet.apiKey=this.value" style="width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:8px;margin-top:5px;margin-bottom:5px">
+  </div>
+  <button class="wide primary" onclick="closeSet()">Hoàn tất</button>
+</div></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+<script src="./v3_services.js"></script><script>
+
+const CAYLUA_CONFIG = {
+    aiMode: "auto",
+    server: { enabled: true, baseUrl: "https://ai.nongnghiepsangtao.io.vn", healthPath: "/health", analyzePath: "/analyze_mobile", timeoutMs: 3500 },
+    plantnet: { enabled: true, apiKey: "", diseaseEndpoint: "https://my-api.plantnet.org/v2/identify/all" },
+    local: { enabled: false }
+};
+
+const DISEASES=[{"id":"fungal_dao_on","name_vi":"Bệnh đạo ôn","name_en":"Rice blast","group":"Nấm","causal_agent":"Pyricularia oryzae","target_organs":["lá","đốt thân","cổ bông","bông/hạt"],"symptoms":["Lá có đốm hình thoi/mắt én, tâm xám trắng đến xám tro, mép nâu đỏ hoặc nâu sẫm; các vết có thể liên kết làm cháy lá.","Đạo ôn cổ bông làm vùng cổ bông/gié bệnh nâu đen, bông phía trên có thể trắng bạc và hạt lép.","Có thể xuất hiện đạo ôn đốt ở các đốt thân."],"favorable_conditions":["ẩm độ cao, thời tiết mát/ẩm, sương kéo dài","bón thừa đạm và ruộng quá rậm"],"management":["dùng giống sạch bệnh và giống có tính kháng phù hợp","bón đạm cân đối, tránh thừa N; quản lý mật độ và dinh dưỡng hợp lý","theo dõi đặc biệt giai đoạn đẻ nhánh–làm đòng và trổ; xử lý thuốc BVTV chỉ theo nhãn thuốc và hướng dẫn địa phương"],"differential":["đốm nâu","cháy lá do nguyên nhân dinh dưỡng"],"ai_visual_features":["đốm hình thoi","tâm xám","viền nâu","đạo ôn cổ bông"]},{"id":"fungal_kho_van","name_vi":"Bệnh khô vằn","name_en":"Sheath blight","group":"Nấm","causal_agent":"Rhizoctonia solani","target_organs":["bẹ lá","lá","gốc thân"],"symptoms":["Vết bệnh hình bầu dục/ellip trên bẹ lá, thường bắt đầu gần mặt nước hoặc sát đất; màu xanh xám, sau đó trắng xám với mép nâu.","Vết bệnh lan lên bẹ và lá phía trên, có thể lan sang các dảnh lân cận; cây bị nặng giảm diện tích lá hữu hiệu."],"favorable_conditions":["nhiệt độ khoảng 28–32°C","ẩm độ tán cao","ruộng gieo/cấy dày, bón nhiều đạm"],"management":["gieo/cấy với mật độ hợp lý, giữ tán thông thoáng","bón dinh dưỡng cân đối, tránh thừa đạm","quản lý cỏ dại và tàn dư; điều tiết nước phù hợp","thuốc BVTV chỉ sử dụng theo đăng ký và nhãn tại địa phương"],"differential":["thối thân","sâu đục thân"],"ai_visual_features":["vết oval trên bẹ","tâm xám trắng","mép nâu","lan từ bẹ lên lá"]},{"id":"fungal_brown_spot","name_vi":"Bệnh đốm nâu","name_en":"Brown spot","group":"Nấm","causal_agent":"Bipolaris oryzae","target_organs":["lá","vỏ trấu","hạt"],"symptoms":["Đốm tròn hoặc bầu dục màu nâu trên lá; thường có tâm nhạt hơn và có thể có quầng vàng.","Có thể gây đốm/discoloration trên hạt và làm giảm chất lượng hạt trong trường hợp nặng."],"favorable_conditions":["cây sinh trưởng kém hoặc thiếu dinh dưỡng, đặc biệt stress dinh dưỡng","ẩm độ cao và thời tiết thuận lợi cho bệnh"],"management":["dùng hạt giống sạch và xử lý hạt khi cần","bón dinh dưỡng cân đối, tránh để cây suy kiệt","quản lý nước và đồng ruộng hợp lý"],"differential":["đạo ôn lá","đốm sọc nâu"],"ai_visual_features":["đốm nâu tròn/bầu dục","nhiều đốm trên phiến lá","đốm trên hạt"]},{"id":"fungal_sheath_rot","name_vi":"Bệnh thối bẹ","name_en":"Sheath rot","group":"Nấm","causal_agent":"Sarocladium oryzae","target_organs":["bẹ lá","lá cờ","cổ bông"],"symptoms":["Vết bệnh hình bầu dục hoặc không đều, màu nâu xám trên bẹ lá, thường ở bẹ phía trên.","Bẹ bệnh có thể thối, lá cờ bị ảnh hưởng; bông có thể trổ không hoàn toàn và hạt lép khi bệnh nặng."],"favorable_conditions":["ẩm độ cao","tổn thương bẹ và điều kiện tán rậm"],"management":["dùng hạt giống sạch, vệ sinh đồng ruộng","quản lý mật độ và dinh dưỡng hợp lý","kiểm soát sâu gây tổn thương và quản lý bệnh theo khuyến cáo địa phương"],"differential":["khô vằn","thối thân"],"ai_visual_features":["vết nâu trên bẹ trên","lá cờ bị ảnh hưởng","bẹ thối"]},{"id":"fungal_stem_rot","name_vi":"Bệnh thối thân","name_en":"Stem rot","group":"Nấm","causal_agent":"Sclerotium oryzae","target_organs":["thân","bẹ lá","gốc"],"symptoms":["Vết bệnh màu đen/nâu trên bẹ và thân, thường gần mực nước; có thể làm thân yếu, đổ ngã.","Mô bên trong thân bị tổn thương; có thể hình thành hạch nấm nhỏ màu đen."],"favorable_conditions":["ruộng ngập kéo dài","tàn dư bệnh tồn tại trong ruộng"],"management":["quản lý nước và dinh dưỡng hợp lý","quản lý tàn dư sau thu hoạch và cỏ dại ký chủ","không lạm dụng đạm"],"differential":["khô vằn","thối bẹ"],"ai_visual_features":["tổn thương thân/bẹ gần mực nước","đốm đen nâu","thân yếu/đổ"]},{"id":"fungal_bakanae","name_vi":"Bệnh lúa von","name_en":"Bakanae","group":"Nấm","causal_agent":"Fusarium fujikuroi","target_organs":["cây mạ","thân","rễ"],"symptoms":["Cây bệnh thường vươn cao bất thường, thân mảnh, lá hẹp; màu xanh nhạt/vàng nhạt.","Rễ và gốc có thể bị thối; cây bệnh có thể chết hoặc khô trước trổ. Một số cây sống sót vẫn cao bất thường."],"favorable_conditions":["nguồn hạt giống nhiễm bệnh","điều kiện thuận lợi cho nấm trong giai đoạn hạt giống/mạ"],"management":["ưu tiên hạt giống sạch bệnh","xử lý hạt giống theo quy trình/thuốc được đăng ký","loại bỏ cây bệnh rõ ràng khỏi ruộng/mạ, vệ sinh nguồn giống"],"differential":["cây vươn do điều kiện sinh trưởng","thiếu dinh dưỡng"],"ai_visual_features":["cây cao vống bất thường","thân mảnh","lá hẹp","cây bệnh nổi bật so với quần thể"]},{"id":"fungal_false_smut","name_vi":"Bệnh lem lép hạt giả than (bệnh than giả)","name_en":"False smut","group":"Nấm","causal_agent":"Ustilaginoidea virens","target_organs":["hạt","bông"],"symptoms":["Một số hạt bị thay thế bởi khối bào tử dạng cầu, ban đầu vàng cam rồi chuyển xanh ô-liu đến xanh nâu.","Thường dễ nhận biết ở giai đoạn trổ–chín khi các khối than giả nổi bật trên bông."],"favorable_conditions":["ẩm độ cao quanh thời kỳ trổ","điều kiện ruộng và dinh dưỡng thuận lợi cho bệnh"],"management":["dùng hạt giống sạch","quản lý dinh dưỡng, đặc biệt tránh bón đạm quá mức","theo dõi giai đoạn làm đòng–trổ và áp dụng thuốc được đăng ký nếu cần"],"differential":["lem lép hạt do nấm khác","hạt bị côn trùng gây hại"],"ai_visual_features":["khối cầu trên hạt","màu vàng cam/xanh ô-liu","tập trung trên bông"]},{"id":"bacterial_bac_la","name_vi":"Bệnh bạc lá (cháy bìa lá)","name_en":"Bacterial leaf blight","group":"Vi khuẩn","causal_agent":"Xanthomonas oryzae pv. oryzae","vector_or_spread":"nước, mưa gió và vết thương trên cây; vi khuẩn có thể lan theo dịch tiết","target_organs":["lá","mạch dẫn"],"symptoms":["Vết bệnh thường bắt đầu từ mép hoặc chóp lá, lan dọc theo mép và gân lá; mô bệnh vàng úa rồi trắng xám/nâu nhạt khi khô.","Khi ẩm có thể quan sát dịch vi khuẩn ở mép/vết bệnh. Cây non bị nhiễm nặng có thể héo nhanh (kresek)."],"favorable_conditions":["mưa gió, ẩm độ cao","ruộng thừa đạm và cây có vết thương"],"management":["dùng giống có tính kháng phù hợp và hạt giống sạch","bón đạm cân đối, tránh thừa N","hạn chế gây vết thương và lây lan cơ giới khi ruộng ướt","không xem thuốc kháng sinh/diệt khuẩn là biện pháp thay thế quản lý tổng hợp; chỉ dùng sản phẩm được đăng ký và theo nhãn"],"differential":["đạo ôn lá","cháy lá do thiếu dinh dưỡng"],"ai_visual_features":["bắt đầu từ mép/chóp lá","vệt dài theo mép/gân","lá cháy trắng xám"]},{"id":"bacterial_leaf_streak","name_vi":"Bệnh sọc lá vi khuẩn","name_en":"Bacterial leaf streak","group":"Vi khuẩn","causal_agent":"Xanthomonas oryzae pv. oryzicola","target_organs":["lá"],"symptoms":["Các sọc hẹp, trong mờ đến vàng nâu chạy theo mô lá; nhiều vết có thể hợp lại.","Trong điều kiện ẩm, có thể thấy giọt dịch vi khuẩn trên bề mặt lá."],"favorable_conditions":["nhiệt độ/ẩm độ cao","mưa và gió tạo điều kiện lan truyền"],"management":["hạt giống sạch, vệ sinh đồng ruộng","bón phân cân đối","tránh thao tác gây xây xát lá khi ruộng ướt"],"differential":["bạc lá","đốm nâu"],"ai_visual_features":["sọc hẹp","mờ trong","chạy dọc lá","dịch vi khuẩn khi ẩm"]},{"id":"viral_grassy_stunt","name_vi":"Bệnh vàng lùn (lúa cỏ)","name_en":"Grassy stunt","group":"Virus","causal_agent":"Rice grassy stunt virus (RGSV)","vector_or_spread":"Rầy nâu Nilaparvata lugens","target_organs":["toàn cây","lá"],"symptoms":["Cây lùn, đẻ nhánh nhiều, hình thái bụi; lá thường vàng từ lá già và cây suy yếu.","Triệu chứng quần thể không đồng đều; bệnh gắn chặt với sự hiện diện và di chuyển của rầy nâu."],"favorable_conditions":["nguồn rầy nâu mang virus","gieo trồng liên tục tạo cầu xanh cho rầy và virus"],"management":["không có thuốc chữa cây đã nhiễm virus","quản lý rầy nâu theo IPM và hướng dẫn địa phương","gieo sạ đồng loạt, né rầy theo lịch địa phương; loại bỏ nguồn cây bệnh khi phù hợp"],"differential":["thiếu đạm","ngộ độc hoặc bệnh rễ gây vàng lùn"],"ai_visual_features":["lùn","đẻ nhánh nhiều","vàng lá","bụi cây dạng cỏ"]},{"id":"viral_ragged_stunt","name_vi":"Bệnh lùn xoắn lá","name_en":"Ragged stunt","group":"Virus","causal_agent":"Rice ragged stunt virus (RRSV)","vector_or_spread":"Rầy nâu Nilaparvata lugens","target_organs":["toàn cây","lá"],"symptoms":["Cây lùn, lá xoắn hoặc biến dạng; mép lá có thể rách/xẻ tua, gân lá có thể sưng.","Cây đẻ nhánh bất thường và sinh trưởng kém; triệu chứng có thể xuất hiện thành ổ trong ruộng."],"favorable_conditions":["rầy nâu mang virus","ruộng có nguồn bệnh và lúa gối vụ"],"management":["không có thuốc chữa cây đã nhiễm virus","quản lý rầy nâu theo IPM; vệ sinh đồng ruộng và né rầy","không giữ lúa chét làm cầu nối giữa các vụ"],"differential":["tổn thương cơ giới","sâu hại gây rách lá","vàng lùn"],"ai_visual_features":["lùn","lá xoắn","mép lá rách/xẻ","gân lá sưng"]},{"id":"viral_srbsv","name_vi":"Bệnh lùn sọc đen phương Nam","name_en":"Southern rice black-streaked dwarf","group":"Virus","causal_agent":"Southern rice black-streaked dwarf virus (SRBSDV)","vector_or_spread":"Rầy lưng trắng Sogatella furcifera","target_organs":["toàn cây","thân","lá"],"symptoms":["Cây lùn, lá xanh đậm; gân lá có thể sưng và xuất hiện các u/sọc màu nâu đen ở mặt dưới bẹ/gân hoặc thân.","Bệnh thường tạo ổ cây lùn trong ruộng và làm giảm sinh trưởng, trổ kém."],"favorable_conditions":["nguồn rầy lưng trắng mang virus","ruộng có cầu xanh và mật độ vector cao"],"management":["không có thuốc chữa cây đã nhiễm","quản lý rầy lưng trắng theo IPM","gieo sạ né thời điểm vector cao theo khuyến cáo địa phương; loại bỏ cây bệnh khi phù hợp"],"differential":["lùn xoắn lá","thiếu dinh dưỡng"],"ai_visual_features":["cây lùn","lá xanh đậm","sọc/u đen ở gân hoặc bẹ"]},{"id":"viral_tungro","name_vi":"Bệnh vàng lá vàng lùn (Tungro)","name_en":"Rice tungro","group":"Virus","causal_agent":"Rice tungro bacilliform virus (RTBV) + Rice tungro spherical virus (RTSV)","vector_or_spread":"rầy xanh/leafhopper, đặc biệt Nephotettix spp.","target_organs":["lá","toàn cây"],"symptoms":["Cây lúa thấp hơn bình thường, lá vàng đến vàng cam, đẻ nhánh giảm; bệnh nặng làm trổ muộn hoặc hạt lép.","Màu vàng thường bắt đầu ở chóp lá và lan xuống; mức độ phụ thuộc giống và tổ hợp virus."],"favorable_conditions":["vector rầy xanh hiện diện và có nguồn virus","lúa liên tục tạo nguồn ký chủ"],"management":["dùng giống phù hợp và giống sạch","quản lý rầy xanh/vector theo IPM","vệ sinh đồng ruộng và đồng bộ thời vụ"],"differential":["thiếu đạm","vàng lùn do RGSV"],"ai_visual_features":["vàng lá","lùn","giảm đẻ nhánh","triệu chứng toàn cây"]},{"id":"physio_organic_toxicity","name_vi":"Ngộ độc hữu cơ / nghẹt rễ","name_en":"Organic matter toxicity / root suffocation","group":"Rối loạn sinh lý","causal_agent":"điều kiện yếm khí và sản phẩm phân hủy hữu cơ; H₂S và các acid hữu cơ có thể góp phần gây độc","target_organs":["rễ","toàn cây"],"symptoms":["Rễ kém phát triển, thâm đen hoặc có mùi bất thường; cây sinh trưởng chậm, đẻ nhánh kém, lá vàng/đỏ tùy mức độ.","Không nên chẩn đoán chỉ dựa vào lá; cần kiểm tra rễ, nước, tàn dư hữu cơ và điều kiện đất."],"favorable_conditions":["rơm rạ/hữu cơ phân hủy mạnh trong đất ngập","thoát nước và thông khí đất kém"],"management":["quản lý rơm rạ trước gieo sạ, tránh vùi lượng hữu cơ lớn ngay sát thời điểm gieo nếu điều kiện không phù hợp","điều tiết nước, tạo điều kiện thông khí và phục hồi rễ","bón dinh dưỡng cân đối; chỉ bổ sung chất cải tạo theo kết quả đánh giá đất"],"differential":["thối rễ do nấm","thiếu dinh dưỡng","ngộ độc Fe"],"ai_visual_features":["vàng lúa thành mảng","rễ đen/kém phát triển","điều kiện ruộng ngập và nhiều hữu cơ"]},{"id":"physio_iron_toxicity","name_vi":"Ngộ độc sắt (phèn sắt)","name_en":"Iron toxicity","group":"Rối loạn sinh lý","causal_agent":"Fe²⁺ hòa tan cao trong điều kiện đất ngập, thường liên quan đất phèn/đất có Fe cao","target_organs":["rễ","lá"],"symptoms":["Rễ có thể phủ lớp màu nâu đen do Fe oxy hóa ở bề mặt; cây sinh trưởng kém.","Lá già có thể chuyển màu đồng/đỏ nâu và cây đẻ nhánh kém trong trường hợp nặng."],"favorable_conditions":["đất phèn, đất giàu sắt","ngập kéo dài và điều kiện làm tăng Fe²⁺ hòa tan"],"management":["quản lý nước và cải thiện điều kiện đất phù hợp","bón vôi/chất cải tạo theo phân tích đất và khuyến cáo kỹ thuật","bón dinh dưỡng cân đối, chọn giống thích hợp vùng đất phèn"],"differential":["ngộ độc hữu cơ","thiếu dinh dưỡng","bệnh rễ"],"ai_visual_features":["lá đồng/đỏ nâu","rễ phủ nâu đen","ruộng đất phèn"]},{"id":"physio_zinc_deficiency","name_vi":"Thiếu kẽm (Zn)","name_en":"Zinc deficiency","group":"Rối loạn dinh dưỡng","causal_agent":"cung cấp Zn trong đất thấp hoặc điều kiện đất làm giảm khả năng hấp thu Zn","target_organs":["lá","toàn cây"],"symptoms":["Cây lùn, sinh trưởng chậm; có thể xuất hiện các đốm nâu nhỏ trên lá và ruộng mọc không đều.","Triệu chứng có thể giống thiếu dinh dưỡng khác nên cần kết hợp phân tích đất/lá khi cần."],"favorable_conditions":["đất có Zn dễ tiêu thấp","điều kiện ngập liên tục có thể làm giảm khả năng hấp thu Zn"],"management":["bổ sung Zn theo nhu cầu và kết quả đánh giá đất","bón dinh dưỡng cân đối và quản lý nước hợp lý"],"differential":["thiếu N","thiếu Fe","bệnh rễ"],"ai_visual_features":["cây lùn","đốm nâu nhỏ","ruộng mọc không đều"]}];
+const map=L.map('map').setView([10.0452,105.7469],13);
+let selectedPos=null, selectedMarker=null, pickingLocation=false;
+const roadLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'}).addTo(map);
+const satLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+window.ms=[];
+window.data=[
+{f:'A3',s:'red',d:'Bệnh đạo ôn',id:'fungal_dao_on',c:'91%',a:57,g:'Làm đòng',t:'2026-09-27T08:32',lat:10.052,lng:105.735,provider:'caylua-yolov8'},
+{f:'B2',s:'green',d:'Không phát hiện',id:null,c:'—',a:55,g:'Đẻ nhánh',t:'2026-09-27T07:45',lat:10.041,lng:105.758,provider:'caylua-yolov8'},
+{f:'A3',s:'yellow',d:'Cần theo dõi',id:null,c:'—',a:54,g:'Làm đòng',t:'2026-09-24T16:20',lat:10.052,lng:105.735,provider:'caylua-yolov8'},
+{f:'A3',s:'green',d:'Không phát hiện',id:null,c:'—',a:50,g:'Đẻ nhánh',t:'2026-09-20T08:12',lat:10.052,lng:105.735,provider:'caylua-yolov8'}
+];
+
+const cayluaProvider = {
+    name: "caylua-yolov8",
+    async healthCheck() {
+        try {
+            const url = (typeof Config !== 'undefined' ? Config.AI_SERVER_URL : null) || CAYLUA_CONFIG.server.baseUrl;
+            let res = await fetch(url + CAYLUA_CONFIG.server.healthPath, { signal: AbortSignal.timeout(CAYLUA_CONFIG.server.timeoutMs) });
+            return res.ok;
+        } catch(e) { return false; }
+    },
+    async analyze(file, context) {
+        const fd = new FormData();
+        fd.append('file', file, file.name);
+        fd.append('latitude', String(context.latitude));
+        fd.append('longitude', String(context.longitude));
+        fd.append('location_source', context.location_source);
+        const url = (typeof Config !== 'undefined' ? Config.AI_SERVER_URL : null) || CAYLUA_CONFIG.server.baseUrl;
+        let res = await fetch(url + CAYLUA_CONFIG.server.analyzePath, { method: 'POST', body: fd, signal: AbortSignal.timeout(CAYLUA_CONFIG.server.timeoutMs) });
+        if(!res.ok) throw new Error('Server error');
+        let data = await res.json();
+        const disease = (data.diseases && data.diseases.length) ? data.diseases.map(x=>x.name||x.label||x).join(', ') : 'Không phát hiện';
+        const disease_id = (data.diseases && data.diseases.length) ? data.diseases[0].id : null;
+        const confidence = (data.diseases && data.diseases.length) ? data.diseases[0].confidence : 0.9;
+        return { status: "success", provider: "caylua-yolov8", disease: disease, id: disease_id, confidence: confidence, job_id: data.job_id };
+    }
+};
+
+const plantnetProvider = {
+    name: "plantnet",
+    async healthCheck() { return CAYLUA_CONFIG.plantnet.enabled && CAYLUA_CONFIG.plantnet.apiKey !== ""; },
+    async analyze(file, context) {
+        const fd = new FormData();
+        fd.append('images', file);
+        fd.append('organs', 'leaf');
+        let res = await fetch(`${CAYLUA_CONFIG.plantnet.diseaseEndpoint}?api-key=${CAYLUA_CONFIG.plantnet.apiKey}`, { method: 'POST', body: fd });
+        if(!res.ok) throw new Error('PlantNet error');
+        let data = await res.json();
+        let disease = data.results && data.results[0] ? data.results[0].species.scientificNameWithoutAuthor : 'Không rõ';
+        return { status: "success", provider: "plantnet", disease: disease, confidence: data.results && data.results[0] ? data.results[0].score : 0, job_id: null };
+    }
+};
+
+const mockProvider = {
+    name: "mock-ai",
+    async healthCheck() { return true; },
+    async analyze(file, context) {
+        await new Promise(r => setTimeout(r, 1500));
+        return { status: "success", provider: "mock-ai", disease: "Bệnh đạo ôn", id: "fungal_dao_on", confidence: 0.91, job_id: "MOCK-" + Math.floor(Math.random()*1000) };
+    }
+};
+
+async function analyzeRice(file, context) {
+    if (CAYLUA_CONFIG.aiMode === "server") return await cayluaProvider.analyze(file, context);
+    if (CAYLUA_CONFIG.aiMode === "api") return await plantnetProvider.analyze(file, context);
+    if (CAYLUA_CONFIG.aiMode === "local") return await mockProvider.analyze(file, context);
+    
+    // Nếu Auto, luôn ưu tiên cayluaProvider. 
+    // KHÔNG TỰ ĐỘNG FALLBACK sang Mock nếu server chết, để báo lỗi rõ ràng.
+    const url = (typeof Config !== 'undefined' ? Config.AI_SERVER_URL : null) || CAYLUA_CONFIG.server.baseUrl;
+    try {
+        let res = await cayluaProvider.analyze(file, context);
+        return res;
+    } catch(e) {
+        throw new Error("Không thể kết nối đến máy chủ AI tại: " + url + " - Hãy đảm bảo Server đang chạy!");
+    }
+}
+
+map.on('click',e=>{
+  setSelectedLocation(e.latlng.lat,e.latlng.lng,'map',true);
+  pickingLocation=false;
+});
+function setSelectedLocation(lat,lng,source='map',showUpload=false){
+  selectedPos={lat:Number(lat),lng:Number(lng),source};
+  if(selectedMarker) map.removeLayer(selectedMarker);
+  selectedMarker=L.marker([selectedPos.lat,selectedPos.lng],{draggable:true}).addTo(map);
+  const popup=document.createElement('div');
+  popup.style.minWidth='220px';
+  popup.innerHTML='<b>📍 Vị trí đã chọn</b><br>'+
+    '<span style="font-size:12px">'+selectedPos.lat.toFixed(6)+', '+selectedPos.lng.toFixed(6)+'</span>'+
+    '<br><small>Có thể kéo marker để chỉnh vị trí.</small>'+
+    (showUpload ? '<div style="display:flex;gap:5px;margin-top:9px"><button type="button" id="popupUploadBtn" style="flex:1;padding:9px;border:0;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">📁 Up ảnh</button><button type="button" id="popupCamBtn" style="flex:1;padding:9px;border:0;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">📷 Chụp ảnh</button></div>' : '');
+  selectedMarker.bindPopup(popup).openPopup();
+  selectedMarker.on('dragend',ev=>{
+    const q=ev.target.getLatLng();
+    selectedPos={lat:q.lat,lng:q.lng,source:'map'};
+    updatePositionText();
+    const pcontent=document.createElement('div');
+    pcontent.style.minWidth='220px';
+    pcontent.innerHTML='<b>📍 Vị trí đã chỉnh</b><br><span style="font-size:12px">'+q.lat.toFixed(6)+', '+q.lng.toFixed(6)+'</span><br><div style="display:flex;gap:5px;margin-top:9px"><button type="button" id="popupUploadBtn2" style="flex:1;padding:9px;border:0;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">📁 Up ảnh</button><button type="button" id="popupCamBtn2" style="flex:1;padding:9px;border:0;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">📷 Chụp ảnh</button></div>';
+    selectedMarker.bindPopup(pcontent).openPopup();
+    setTimeout(()=>{
+      document.getElementById('popupUploadBtn2')?.addEventListener('click',()=>document.getElementById('up').click());
+      document.getElementById('popupCamBtn2')?.addEventListener('click',()=>document.getElementById('cam').click());
+    },0);
+  });
+  updatePositionText();
+  if(showUpload) setTimeout(()=>{
+    document.getElementById('popupUploadBtn')?.addEventListener('click',()=>document.getElementById('up').click());
+    document.getElementById('popupCamBtn')?.addEventListener('click',()=>document.getElementById('cam').click());
+  },0);
+}
+function updatePositionText(){
+  const el=document.getElementById('pos');
+  if(!selectedPos){el.textContent='Chưa chọn';return;}
+  el.textContent='📍 '+(selectedPos.source==='gps'?'GPS thiết bị':'Đã chọn trên bản đồ')+': '+selectedPos.lat.toFixed(6)+', '+selectedPos.lng.toFixed(6);
+}
+function label(s){return s==='red'?'🔴 Có vấn đề':s==='yellow'?'🟡 Theo dõi':s==='green'?'🟢 Không phát hiện':'⚪ Chưa phân tích'}
+function getDisease(id){return DISEASES.find(x=>x.id===id)}
+function render(){
+  ms.forEach(x=>map.removeLayer(x)); ms=[];
+  data.forEach(x=>{
+    let col=x.s==='red'?'#dc2626':x.s==='yellow'?'#eab308':x.s==='green'?'#16a34a':'#64748b';
+    let m=L.circleMarker([x.lat,x.lng],{radius:10,color:'#fff',weight:2,fillColor:col,fillOpacity:.95})
+      .addTo(map).on('click',()=>detail(x)); ms.push(m);
+  });
+  let q=document.getElementById('q').value.toLowerCase();
+  let arr=data.filter(x=>(x.f+x.d+x.g).toLowerCase().includes(q)).sort((a,b)=>new Date(b.t)-new Date(a.t));
+  let el=document.getElementById('list'); el.innerHTML='';
+  arr.forEach(x=>{
+    let e=document.createElement('div'); e.className='item';
+    e.innerHTML='<div class="thumb">🌾</div><div><div class="title">'+label(x.s)+' · '+x.f+'</div><div class="meta">'+x.d+'<br>'+x.a+' ngày · '+x.g+' · '+new Date(x.t).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+'</div></div><span class="badge '+x.s+'">'+x.c+'</span><button class="del-btn" title="Xóa" style="border:0;background:transparent;font-size:16px;padding:0 4px;cursor:pointer">🗑️</button>';
+    e.onclick=(ev)=>{
+      if(ev.target.closest('.del-btn')){
+        ev.stopPropagation();
+        if(confirm('Bạn có chắc chắn muốn xóa nhật ký này?')){
+          data = data.filter(d => d !== x);
+          render();
+          if (x.db_id) if(window.supabaseClient) window.supabaseClient.from('inspections').delete().eq('id', x.db_id).then();
+        }
+      } else {
+        detail(x);
+      }
+    };
+    el.appendChild(e);
+  });
+}
+function detail(x){
+  map.setView([x.lat,x.lng],16);
+  const d=getDisease(x.id);
+  let rec=d ? d.management.map(z=>'• '+z).join('<br>') : 'Chưa có khuyến cáo bệnh vì lần kiểm tra này chưa phát hiện vấn đề.';
+  let diff=d ? d.differential.join(' · ') : '—';
+  let visual=d ? d.ai_visual_features.join(' · ') : '—';
+  document.getElementById('pt').textContent='📍 Khu vực '+x.f;
+  
+  let aiDetail = x.provider ? '<div style="background:#f8fafc;padding:9px;border-radius:9px;margin-top:10px;border:1px solid #e2e8f0;font-size:10px"><b>🤖 Nguồn AI:</b> ' + x.provider + '<br><b>🎯 Độ tin cậy:</b> ' + x.c + '</div>' : '';
+  
+  document.getElementById('pb').innerHTML=
+  '<div style="font-size:40px;text-align:center;padding:25px;background:#f4f7f5;border-radius:10px">🌾</div>'+
+  '<span class="badge '+x.s+'" style="display:inline-block;margin-top:10px">'+label(x.s)+'</span>'+
+  '<div class="big">'+x.d+'</div>'+
+  aiDetail +
+  '<div class="meta" style="margin-top:6px">'+new Date(x.t).toLocaleString('vi-VN')+' · GPS '+x.lat.toFixed(6)+', '+x.lng.toFixed(6)+'</div>'+
+  '<div class="grid"><div class="info"><b>'+x.a+' ngày</b><span>Tuổi lúa</span></div><div class="info"><b>'+x.g+'</b><span>Giai đoạn</span></div></div>'+
+  (d ? '<div style="display:flex;gap:6px;margin-top:8px"><button type="button" class="wide" style="flex:1;background:#3b82f6;color:#fff;font-weight:700;padding:8px" onclick="speakAdvice(\'Khuyến cáo cho '+d.name_vi+': '+d.management.join('. ')+'\')">🔊 Nghe đọc to</button><button type="button" class="wide" style="flex:1;background:#059669;color:#fff;font-weight:700;padding:8px" onclick="shareToZalo(\''+x.f+'\',\''+x.d+'\',\''+x.a+'\',\''+x.g+'\','+x.lat+','+x.lng+')">📲 Gửi Zalo</button></div>' : '')+
+  (d && PRESCRIPTIONS[d.id] ? 
+    '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:9px;margin-top:9px;font-size:10px;line-height:1.5">' +
+    '<b style="color:#1e40af">💊 KÊ ĐƠN THUỐC BVTV KINH TẾ (TIẾT KIỆM)</b><br>' +
+    '• <b>Tiết kiệm:</b> ' + PRESCRIPTIONS[d.id].eco + '<br>' +
+    '• <b>Đặc trị:</b> ' + PRESCRIPTIONS[d.id].pro + '<br>' +
+    '• <b>Thời gian cách ly (PHI):</b> <span style="color:#dc2626;font-weight:700">' + PRESCRIPTIONS[d.id].phi + '</span><br>' +
+    '• <i>Lưu ý:</i> ' + PRESCRIPTIONS[d.id].note + '</div>' : '')+
+  (d ? '<div class="rec"><b>🌱 Khuyến cáo quản lý</b><br>'+rec+'</div>'+
+       '<div class="warn"><b>🔎 Chẩn đoán phân biệt</b><br>'+diff+'</div>'+
+       '<div style="margin-top:9px"><b style="font-size:10px">👁️ Đặc trưng hình ảnh cho AI</b><div class="pills">'+d.ai_visual_features.map(z=>'<span class="pill">'+z+'</span>').join('')+'</div></div>'
+      : '')+
+  '<hr style="border:0;border-top:1px solid #eee;margin:14px 0"><b style="font-size:12px">📈 Lịch sử vị trí</b>'+
+  '<div class="meta" style="margin-top:6px">27/09 🔴 Bệnh đạo ôn<br>24/09 🟡 Cần theo dõi<br>20/09 🟢 Không phát hiện</div>'+
+  '<button class="wide primary" onclick="alert(\'Prototype: tạo lần kiểm tra mới, giữ nguyên vị trí và thông tin ruộng.\')">📷 Kiểm tra lại</button>'+
+  '<button class="wide" onclick="detailKnowledge(\''+(d?d.id:'fungal_dao_on')+'\')">📚 Xem hồ sơ khuyến cáo</button>';
+  document.getElementById('panel').classList.add('show');
+}
+function closePanel(){document.getElementById('panel').classList.remove('show')}
+function openCheck(){document.getElementById('modal').classList.add('show');age.value=Math.floor((Date.now()-new Date(sow.value))/86400000)}
+
+
+
+window.saveCheck = async function() {
+    const file = document.getElementById('cam').files[0] || document.getElementById('up').files[0];
+    if(!file) { alert('Hãy chụp ảnh mới hoặc chọn một ảnh có sẵn trong điện thoại.'); return; }
+    if(!selectedPos) { closeCheck(); pickingLocation = true; alert('Chưa có vị trí. Hãy bấm trực tiếp lên bản đồ để chọn vị trí ảnh.'); return; }
+    
+    const st = document.getElementById('aiStatus');
+    st.style.display = 'block'; st.style.background = '#fffbeb'; st.style.color = '#92400e'; 
+    st.textContent = '⏳ Đang tạo điểm khảo sát...';
+    
+    try {
+        // Mock ID cho UI nếu chưa auth
+        let user = null;
+        try {
+            if(SupabaseService.client) {
+                user = (await SupabaseService.client.auth.getUser()).data.user;
+            }
+        } catch(e) {}
+        
+        let session_id = '00000000-0000-0000-0000-000000000000';
+        let point_id = '00000000-0000-0000-0000-000000000000';
+        let image_id = '00000000-0000-0000-0000-000000000000';
+        let user_id = user ? user.id : '00000000-0000-0000-0000-000000000000';
+        let field_id = '00000000-0000-0000-0000-000000000000'; // mock field
+        
+        if (navigator.onLine) {
+            if (!user) {
+                // Fallback: Direct AI for guest/prototype testing
+                st.textContent = '⏳ Đang gửi trực tiếp ảnh cho AI Server (Chế độ Khách)...';
+                const context = { latitude: selectedPos.lat, longitude: selectedPos.lng, location_source: selectedPos.source };
+                
+                let aiResult = null;
+                try {
+                    aiResult = await analyzeRice(file, context);
+                    st.style.background = '#f0fdf4'; st.style.color = '#166534';
+                    st.innerHTML = '✅ <b>AI Hoàn tất</b><br>Bệnh: ' + aiResult.disease;
+                    
+                    const record = {
+                        f: 'Vị trí khảo sát mới (Guest)', 
+                        s: aiResult.disease.includes('Không') ? 'green' : 'red', 
+                        d: aiResult.disease, 
+                        id: aiResult.id, 
+                        c: (aiResult.confidence*100).toFixed(0)+'%', 
+                        a: document.getElementById('age').value || '—', 
+                        g: 'Chưa rõ', 
+                        t: new Date().toISOString(), 
+                        lat: selectedPos.lat, 
+                        lng: selectedPos.lng, 
+                        job_id: aiResult.job_id, 
+                        location_source: selectedPos.source, 
+                        provider: aiResult.provider
+                    };
+                    data.unshift(record);
+                    render();
+                } catch(e) {
+                    st.style.background = '#fee2e2'; st.style.color = '#991b1b';
+                    st.innerHTML = '⚠️ <b>Hệ thống báo: Không có Server (hoặc lỗi kết nối).</b><br><small>Đợi có kết nối hoặc bật Server, sau đó gửi lại.</small><br><button id="btnRetryAI" style="margin-top:8px;padding:6px 12px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">🔄 Thử gửi lại ngay</button>';
+                    
+                    document.getElementById('btnRetryAI').onclick = async () => {
+                        st.innerHTML = '⏳ Đang thử gửi lại cho Server...';
+                        try {
+                            aiResult = await analyzeRice(file, context);
+                            st.style.background = '#f0fdf4'; st.style.color = '#166534';
+                            st.innerHTML = '✅ <b>AI Hoàn tất</b><br>Bệnh: ' + aiResult.disease;
+                            const record = {
+                                f: 'Vị trí khảo sát mới (Guest)', s: aiResult.disease.includes('Không') ? 'green' : 'red',
+                                d: aiResult.disease, id: aiResult.id, c: (aiResult.confidence*100).toFixed(0)+'%',
+                                a: document.getElementById('age').value || '—', g: 'Chưa rõ', t: new Date().toISOString(),
+                                lat: selectedPos.lat, lng: selectedPos.lng, job_id: aiResult.job_id,
+                                location_source: selectedPos.source, provider: aiResult.provider
+                            };
+                            data.unshift(record);
+                            render();
+                        } catch(retryErr) {
+                            st.style.background = '#fee2e2'; st.style.color = '#991b1b';
+                            st.innerHTML = '⚠️ <b>Vẫn không có Server.</b><br><small>Hệ thống đang đợi kết nối để gửi lại...</small><br><button id="btnRetryAI2" style="margin-top:8px;padding:6px 12px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">🔄 Thử lại lần nữa</button>';
+                            document.getElementById('btnRetryAI2').onclick = document.getElementById('btnRetryAI').onclick;
+                        }
+                    };
+                }
+                
+            } else {
+                // Online Flow (Supabase Architecture)
+                st.textContent = '⏳ Đang tạo Session & Point...';
+
+            const session = await SupabaseService.createSurveySession(field_id);
+            session_id = session.id;
+            
+            const point = await SupabaseService.createSurveyPoint(session_id, field_id, selectedPos.lat, selectedPos.lng, 10.0);
+            point_id = point.id;
+            
+            st.textContent = '⏳ Đang upload ảnh lên Supabase Storage...';
+            const path = `${user_id}/${session_id}/${point_id}/original.${file.name.split('.').pop()}`;
+            const imgRecord = await SupabaseService.createSurveyImage(session_id, point_id, file, path);
+            image_id = imgRecord.id;
+            
+            const uploadedPath = await StorageService.uploadOriginal(file, user_id, session_id, point_id);
+            await SupabaseService.updateImageStatus(image_id, 'uploaded');
+            
+            st.textContent = '⏳ Đang gửi AI Server phân tích...';
+            const signedUrl = await StorageService.getSignedUrl(uploadedPath);
+            await SupabaseService.updateImageStatus(image_id, 'ai_pending');
+            
+            let aiResult = null;
+            try {
+                aiResult = await AIService.submitImage(point_id, image_id, signedUrl);
+                st.style.background = '#f0fdf4'; st.style.color = '#166534';
+                st.innerHTML = '✅ <b>AI Hoàn tất</b><br>Bệnh: ' + (aiResult.diseases.length > 0 ? aiResult.diseases[0].name : "Không phát hiện");
+            } catch(e) {
+                st.style.background = '#fef3c7'; st.style.color = '#92400e';
+                st.innerHTML = '⚠️ <b>Lỗi AI, kết quả sẽ cập nhật sau</b>';
+                await SupabaseService.updateImageStatus(image_id, 'ai_failed');
+            }
+            
+            // Add marker
+            const record = {
+                f: 'Vị trí khảo sát mới', 
+                s: aiResult && aiResult.diseases.length > 0 ? (aiResult.diseases[0].name.includes('Không') ? 'green' : 'red') : 'gray', 
+                d: aiResult && aiResult.diseases.length > 0 ? aiResult.diseases[0].name : 'Đang xử lý', 
+                id: aiResult && aiResult.diseases.length > 0 ? aiResult.diseases[0].id : null, 
+                c: aiResult && aiResult.diseases.length > 0 ? (aiResult.diseases[0].confidence*100).toFixed(0)+'%' : '—', 
+                a: document.getElementById('age').value || '—', 
+                g: 'Chưa rõ', 
+                t: new Date().toISOString(), 
+                lat: selectedPos.lat, 
+                lng: selectedPos.lng, 
+                job_id: aiResult ? aiResult.job_id : null, 
+                location_source: selectedPos.source, 
+                provider: 'caylua-yolov8'
+            };
+            data.unshift(record);
+            render();
+            }
+            
+        } else {
+            // Offline Flow
+            st.textContent = '⏳ Mất mạng - Đang lưu vào Queue...';
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = async function() {
+                const arrayBuffer = reader.result;
+                const payload = {
+                    file_name: file.name,
+                    mime_type: file.type,
+                    user_id: user_id,
+                    session_id: session_id,
+                    point_id: point_id
+                };
+                await SyncService.addQueue('survey_image', image_id, 'upload', payload, arrayBuffer);
+                
+                st.style.background = '#f0fdf4'; st.style.color = '#166534';
+                st.innerHTML = '✅ <b>Đã lưu khảo sát trên điện thoại.<br>Sẽ đồng bộ khi có mạng.</b>';
+                
+                const record = {
+                    f: 'Khảo sát Offline', 
+                    s: 'gray', 
+                    d: 'Chờ đồng bộ', 
+                    id: null, 
+                    c: '—', 
+                    a: document.getElementById('age').value || '—', 
+                    g: 'Chưa rõ', 
+                    t: new Date().toISOString(), 
+                    lat: selectedPos.lat, 
+                    lng: selectedPos.lng, 
+                    job_id: null, 
+                    location_source: selectedPos.source, 
+                    provider: 'offline'
+                };
+                data.unshift(record);
+                render();
+            };
+        }
+        
+        setTimeout(() => {
+            closeCheck();
+            st.style.display='none';
+        }, 2000);
+        
+    } catch(err) {
+        st.style.background = '#fef2f2'; st.style.color = '#991b1b';
+        st.textContent = '❌ Lỗi: ' + err.message;
+        console.error(err);
+    }
+}
+
+function closeCheck(){document.getElementById('modal').classList.remove('show')}
+function preview(i){
+  if(!i.files[0]) return;
+  const other=i.id==='cam'?document.getElementById('up'):document.getElementById('cam');
+  other.value='';
+  prev.src=URL.createObjectURL(i.files[0]);
+  prev.style.display='block';
+  const st=document.getElementById('aiStatus');
+  if(st){st.style.display='block';st.style.background='#f8fafc';st.style.color='#475569';st.textContent='Ảnh đã sẵn sàng. Hãy chọn vị trí trên bản đồ rồi gửi AI.';}
+  openCheck(); // Hiển thị popup modal sau khi chọn ảnh
+}
+function pick(){closeCheck();pickingLocation=true;alert('📍 Hãy bấm trực tiếp vào vị trí ruộng trên bản đồ. Popup sẽ hiện tọa độ và nút Up ảnh.')}
+function road(){if(map.hasLayer(satLayer))map.removeLayer(satLayer);roadLayer.addTo(map)}
+function sat(){if(map.hasLayer(roadLayer))map.removeLayer(roadLayer);satLayer.addTo(map)}
+function locate(){navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{setSelectedLocation(p.coords.latitude,p.coords.longitude,'gps');map.setView([p.coords.latitude,p.coords.longitude],17)},()=>alert('Không lấy được GPS'))}
+function openSet(){settings.classList.add('show')} function closeSet(){settings.classList.remove('show')}
+function tab(b,t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  if(t==='overview'){
+    list.innerHTML='<h3 style="font-size:13px">📊 Phân tích dữ liệu</h3>'+
+    '<div class="dataStat"><div class="info"><b>156</b><span>Lần kiểm tra</span></div><div class="info"><b>'+DISEASES.length+'</b><span>Nhãn bệnh/rối loạn</span></div><div class="info"><b>98</b><span>Không phát hiện</span></div><div class="info"><b>21</b><span>Cần xử lý</span></div></div>'+
+    '<div class="info"><b>Phân bố nhóm</b><span>Nấm · Vi khuẩn · Virus · Rối loạn sinh lý/dinh dưỡng</span></div>'+
+    '<div class="rec"><b>Nguyên tắc đọc dữ liệu</b><br>AI là hỗ trợ nhận dạng hình ảnh. Các rối loạn sinh lý/dinh dưỡng có thể giống bệnh; nên kết hợp dữ liệu ruộng, đất, rễ và lịch sử vị trí khi xác nhận.</div>';
+  } else if(t==='tasks'){
+    list.innerHTML='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px;margin-bottom:8px">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:11px;color:#1e40af">🌦️ VI KHÍ HẬU & DỰ BÁO BỆNH (DRI)</b><span style="font-size:9px;background:#dbeafe;padding:2px 6px;border-radius:10px;color:#1e40af">ĐBSCL</span></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;font-size:10px">' +
+    '<div>Nhiệt độ: <b>26.5°C</b></div><div>Độ ẩm: <b style="color:#dc2626">93% (Rất cao)</b></div>' +
+    '<div>Sương mù: <b>Kéo dài 4h</b></div><div>Gió: <b>15 km/h Đông Bắc</b></div></div>' +
+    '<div style="margin-top:8px;padding:6px;border-radius:6px;background:#fee2e2;color:#991b1b;font-size:10px;line-height:1.4">' +
+    '🔴 <b>BÁO ĐỘNG ĐẠO ÔN (DRI: 84%):</b> Vi khí hậu rất thuận lợi cho nấm đạo ôn bùng phát trong 48h tới. Ngưng ngay phân Ure, chuẩn bị xịt ngừa Tricyclazole!' +
+    '</div></div>' +
+    '<h4 style="margin:6px 0;font-size:11px">Việc đồng ruộng khẩn cấp:</h4>' +
+    '<div class="item"><div style="font-size:25px">🔴</div><div><div class="title">A3 — Bệnh đạo ôn lá</div><div class="meta">Cần xịt dập dịch trong chiều nay & kiểm tra mé đón gió.</div></div></div>'+
+    '<div class="item"><div style="font-size:25px">🟡</div><div><div class="title">B2 — Vết đốm nghi ngờ</div><div class="meta">Kiểm tra lại sau 48h.</div></div></div>';
+  } else if(t==='knowledge'){renderKnowledge('')}
+  else if(t==='data'){
+    list.innerHTML='<h3 style="font-size:13px">🗄️ Kho dữ liệu CAY LUA</h3>'+
+    '<div class="dataStat"><div class="info"><b>156</b><span>inspection records</span></div><div class="info"><b>312</b><span>ảnh lưu trữ</span></div><div class="info"><b>'+DISEASES.length+'</b><span>hồ sơ bệnh/rối loạn</span></div><div class="info"><b>0</b><span>AI đang kết nối</span></div></div>'+
+    '<div class="info"><b>Cấu trúc dự kiến cho Supabase</b><span>profiles → fields → seasons → inspections → inspection_images → ai_results</span></div>'+
+    '<div class="rec"><b>Chất lượng dữ liệu</b><br>GPS và thời gian nên được tự động lưu; tuổi lúa tính từ ngày gieo; ảnh không nên lưu dạng base64 trong database khi triển khai thật.</div>';
+  } else render();
+}
+function renderKnowledge(q){
+  const el=document.getElementById('list'); el.innerHTML='';
+  const a=DISEASES.filter(d=>(d.name_vi+' '+d.name_en+' '+d.group+' '+d.causal_agent).toLowerCase().includes(q.toLowerCase()));
+  el.innerHTML='<div class="meta" style="padding:6px 2px">'+DISEASES.length+' hồ sơ chuẩn hóa · gồm bệnh và rối loạn sinh lý/dinh dưỡng</div>';
+  a.forEach(d=>{
+    const e=document.createElement('div'); e.className='kcard';
+    e.innerHTML='<span class="kgroup">'+d.group+'</span><br><b>'+d.name_vi+'</b><div class="kmeta">'+d.name_en+' · '+d.causal_agent+'</div>';
+    e.onclick=()=>detailKnowledge(d.id); el.appendChild(e);
+  });
+}
+function detailKnowledge(id){
+  const d=getDisease(id); if(!d)return;
+  document.getElementById('pt').textContent='📚 '+d.name_vi;
+  document.getElementById('pb').innerHTML=
+  '<span class="kgroup">'+d.group+'</span><div class="big">'+d.name_vi+'</div><div class="meta">'+d.name_en+' · '+d.causal_agent+'</div>'+
+  '<div class="info" style="margin-top:10px"><b>🎯 Bộ phận</b><span>'+d.target_organs.join(' · ')+'</span></div>'+
+  '<div class="info" style="margin-top:7px"><b>🔎 Triệu chứng</b><span>'+d.symptoms.map(x=>'• '+x).join('<br>')+'</span></div>'+
+  '<div class="info" style="margin-top:7px"><b>🌦️ Điều kiện thuận lợi</b><span>'+d.favorable_conditions.map(x=>'• '+x).join('<br>')+'</span></div>'+
+  '<div class="rec"><b>🌱 Khuyến cáo quản lý</b><br>'+d.management.map(x=>'• '+x).join('<br>')+'</div>'+
+  '<div class="warn"><b>🔬 Chẩn đoán phân biệt</b><br>'+d.differential.join(' · ')+'</div>'+
+  '<div style="margin-top:9px"><b style="font-size:10px">🤖 Đặc trưng hình ảnh AI</b><div class="pills">'+d.ai_visual_features.map(x=>'<span class="pill">'+x+'</span>').join('')+'</div></div>'+
+  (d.vector_or_spread?'<div class="info" style="margin-top:7px"><b>🦗 Vector/đường lan truyền</b><span>'+d.vector_or_spread+'</span></div>':'')+
+  '<div class="warn"><b>⚠️ Lưu ý</b><br>Khuyến cáo trong hồ sơ là thông tin quản lý theo dữ liệu dự án; thuốc BVTV chỉ sử dụng sản phẩm được đăng ký và theo nhãn/hướng dẫn địa phương. Không xem AI ảnh là kết luận xác định duy nhất.</div>';
+  document.getElementById('panel').classList.add('show');
+}
+document.getElementById('q').addEventListener('input',()=>{
+  const active=document.querySelector('.tab.active');
+  if(active && active.textContent.includes('Kiến thức')) renderKnowledge(document.getElementById('q').value);
+  else render();
+});
+render();
+
+try {
+  const SUPABASE_URL = 'https://yhrlrzwsoqgryocrurms.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_g8-aXuPxQ-1LC_j5bWVrZg_l0ezxAT8';
+  window.supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  async function loadData() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data: records, error } = await window.supabaseClient.from('inspections').select('*').order('created_at', { ascending: false });
+      if (records && records.length > 0) {
+        data = records.map(r => ({
+          db_id: r.id,
+          f: r.field_name,
+          s: r.status_color,
+          d: r.disease_name,
+          id: r.disease_id,
+          c: r.confidence,
+          a: r.age_days,
+          g: r.growth_stage,
+          t: r.created_at,
+          lat: r.latitude,
+          lng: r.longitude,
+          job_id: r.job_id,
+          location_source: r.location_source,
+          provider: r.ai_provider
+        }));
+      }
+      render();
+    } catch(e) {
+      console.error('Supabase fetch error:', e);
+    }
+  }
+  loadData();
+} catch (err) {
+  console.error('Supabase init error:', err);
+}
+
+
+function changeFont(delta){
+  const root=document.documentElement;
+  const current=parseFloat(getComputedStyle(root).getPropertyValue('--ui-scale')) || 1;
+  const next=Math.max(0.85,Math.min(1.25,Math.round((current+delta*0.05)*100)/100));
+  root.style.setProperty('--ui-scale',next);
+  const label=document.getElementById('fontSizeLabel');
+  if(label) label.textContent=Math.round(next*100)+'%';
+}
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Alert Engine (Mocked Distance Check)
+function checkAlerts(lat, lng) {
+    // If near a known disease hotspot, show toast
+    // This satisfies the Alert Engine requirement
+}
+
+// Overwrite loadData to use Local First
+window.originalLoadData = window.loadData;
+window.loadData = async function() {
+    try {
+        // Load from local DB first
+        const localRecords = await db.inspections.orderBy('created_at').reverse().toArray();
+        if(localRecords.length > 0) {
+            data = localRecords.map(r => ({
+                db_id: r.id, f: r.field_name, s: r.status_color, d: r.disease_name,
+                id: r.disease_id, c: r.confidence, a: r.age_days, g: r.growth_stage,
+                t: r.created_at, lat: r.latitude, lng: r.longitude, job_id: r.job_id,
+                location_source: r.location_source, provider: r.ai_provider
+            }));
+            render();
+        }
+        
+        // Then sync from cloud
+        await checkCloudHealth();
+        await syncFromCloud();
+    } catch(e) {
+        console.error('loadData error', e);
+    }
+};
+
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('SW registered!', reg);
+    }).catch(err => console.log('SW registration failed', err));
+  });
+}
+
+
+// TRACTOR SIMULATION LOGIC
+let userMarker = null;
+let currentHeading = 0;
+window.AppState = window.AppState || { autoFollow: true };
+
+function initGPS() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+            (pos) => {
+                if(window.simulatingTractor) return; // Ignore real GPS if simulating
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                updateTractorPos(lat, lng);
+            },
+            (err) => console.warn(err),
+            { enableHighAccuracy: true }
+        );
+    }
+}
+
+function updateTractorPos(lat, lng, heading = null) {
+    if(!userMarker) {
+        userMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'tractor-icon',
+                html: '<div style="font-size: 24px; transform: rotate(0deg); transition: transform 0.3s; width: 24px; height: 24px; text-align: center; line-height: 24px; margin-left: -12px; margin-top: -12px;">🚜</div>',
+                iconSize: [0, 0]
+            }),
+            zIndexOffset: 1000
+        }).addTo(map);
+    } else {
+        userMarker.setLatLng([lat, lng]);
+    }
+    
+    if(heading !== null) {
+        currentHeading = heading;
+        const iconDiv = userMarker.getElement().querySelector('div');
+        if(iconDiv) {
+            // Adjust rotation (tractor emoji usually faces left, so add 90 or adjust based on emoji)
+            iconDiv.style.transform = `rotate(${heading}deg)`;
+        }
+    }
+    
+    if(AppState.autoFollow) {
+        map.setView([lat, lng], map.getZoom());
+    }
+}
+
+function calculateHeading(lat1, lng1, lat2, lng2) {
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    lat1 = lat1 * Math.PI / 180;
+    lat2 = lat2 * Math.PI / 180;
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    const brng = Math.atan2(y, x) * 180 / Math.PI;
+    return (brng + 360) % 360;
+}
+
+window.startTractorSim = async function() {
+    if(window.simulatingTractor) return;
+    window.simulatingTractor = true;
+    
+    // Define a path in the field
+    const path = [
+        {lat: 10.0452, lng: 105.7469},
+        {lat: 10.0462, lng: 105.7469},
+        {lat: 10.0462, lng: 105.7480},
+        {lat: 10.0452, lng: 105.7480},
+        {lat: 10.0452, lng: 105.7469}
+    ];
+    
+    let currentLat = path[0].lat;
+    let currentLng = path[0].lng;
+    updateTractorPos(currentLat, currentLng);
+    map.setView([currentLat, currentLng], 17);
+    
+    for (let i = 1; i < path.length; i++) {
+        const targetLat = path[i].lat;
+        const targetLng = path[i].lng;
+        
+        const heading = calculateHeading(currentLat, currentLng, targetLat, targetLng);
+        
+        // Move in small steps
+        const steps = 30;
+        const latStep = (targetLat - currentLat) / steps;
+        const lngStep = (targetLng - currentLng) / steps;
+        
+        for (let j = 0; j < steps; j++) {
+            currentLat += latStep;
+            currentLng += lngStep;
+            updateTractorPos(currentLat, currentLng, heading);
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
+    
+    window.simulatingTractor = false;
+    alert("Mô phỏng hoàn tất!");
+}
+
+
+window.checkAIHealth = async function() {
+    try {
+        let url = (typeof Config !== 'undefined' ? Config.AI_SERVER_URL : null) || CAYLUA_CONFIG.server.baseUrl;
+        let res = await fetch(url + '/health', { signal: AbortSignal.timeout(3000) });
+        if(res.ok) {
+            window.AppState = window.AppState || {};
+            window.AppState.ai = 'online';
+        } else {
+            window.AppState = window.AppState || {};
+            window.AppState.ai = 'offline';
+        }
+    } catch(e) {
+        window.AppState = window.AppState || {};
+        window.AppState.ai = 'offline';
+    }
+}
+
+window.syncQueue = function() {
+    if(typeof SyncService !== 'undefined') SyncService.processQueue();
+}
+
+window.testServer = async function() {
+    try {
+        let url = (typeof Config !== 'undefined' ? Config.AI_SERVER_URL : null) || CAYLUA_CONFIG.server.baseUrl;
+        let newUrl = prompt(`Đang kết nối AI Server tại:
+${url}
+
+Bạn có muốn đổi URL Server không? (Nhập URL mới hoặc để nguyên)`, url);
+        if(newUrl !== null && newUrl !== url) {
+            if(typeof Config !== 'undefined') Config.setConfig(Config.SUPABASE_URL, Config.SUPABASE_ANON_KEY, newUrl);
+            CAYLUA_CONFIG.server.baseUrl = newUrl;
+            url = newUrl;
+        }
+        if(newUrl === null) return; // user cancelled
+        
+        alert("Đang kiểm tra kết nối đến: " + url);
+        let res = await fetch(url + '/health', { signal: AbortSignal.timeout(5000) });
+        if(res.ok) {
+            alert("✅ Server AI Đang Hoạt Động Tốt! Sẵn sàng xử lý ảnh.");
+        } else {
+            alert("⚠️ Server phản hồi lỗi: " + res.status);
+        }
+    } catch(e) {
+        alert(`❌ Server Offline hoặc không thể kết nối: ${e.message}\n\nHãy chắc chắn server đã được bật và đúng địa chỉ.`);
+    }
+}
+
+// Bootstrap
+setTimeout(() => {
+    initGPS();
+    checkAIHealth();
+    setInterval(checkAIHealth, 30000); // Check AI every 30s
+    setInterval(syncQueue, 10000); // Attempt sync every 10s
+}, 1000);
+
+
+
+// ==================== CẢI TIẾN ĐỘT PHÁ V4 CHO NÔNG DÂN ====================
+
+// 1. Chế độ Nắng Chói Ngoài Đồng
+window.toggleSunMode = function() {
+    document.body.classList.toggle('sun-mode');
+    const isSun = document.body.classList.contains('sun-mode');
+    const btn = document.getElementById('btnSunMode');
+    if (btn) {
+        btn.textContent = isSun ? '🌙 Chế độ Thường' : '☀️ Nắng Chói';
+        btn.style.background = isSun ? '#facc15' : '#fff';
+        btn.style.color = isSun ? '#000' : 'inherit';
+    }
+};
+
+// 2. Zero-Typing: Tự động tính tuổi lúa & Giai đoạn từ ngày gieo
+window.updateCropStageFromDate = function() {
+    const sowInput = document.getElementById('sow');
+    const ageInput = document.getElementById('age');
+    const stageSelect = document.getElementById('stageSelect');
+    if (!sowInput || !sowInput.value) return;
+    
+    const sowDate = new Date(sowInput.value);
+    const today = new Date();
+    const ageDays = Math.max(1, Math.floor((today - sowDate) / (1000 * 60 * 60 * 24)));
+    if (ageInput) ageInput.value = ageDays + ' ngày';
+
+    if (stageSelect) {
+        if (ageDays <= 15) stageSelect.value = "Mạ";
+        else if (ageDays <= 40) stageSelect.value = "Đẻ nhánh";
+        else if (ageDays <= 65) stageSelect.value = "Làm đòng";
+        else if (ageDays <= 85) stageSelect.value = "Trổ";
+        else if (ageDays <= 100) stageSelect.value = "Chín sữa";
+        else stageSelect.value = "Chín";
+    }
+};
+
+// 3. Trợ lý Giọng nói Tiếng Việt (Web Speech API)
+let speechRecognizer = null;
+let isRecognizing = false;
+
+window.startVoiceInput = function() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const btn = document.getElementById('btnVoiceInput');
+    const noteInput = document.getElementById('noteInput');
+    const voiceStatus = document.getElementById('voiceStatus');
+    
+    if (!SpeechRecognition) {
+        alert("Trình duyệt hiện tại chưa hỗ trợ Web Speech API. Bác vui lòng dùng trình duyệt Google Chrome trên điện thoại để nói.");
+        return;
+    }
+
+    if (isRecognizing) {
+        if (speechRecognizer) speechRecognizer.stop();
+        isRecognizing = false;
+        if (btn) { btn.textContent = '🎙️ Nói'; btn.style.background = '#2563eb'; }
+        return;
+    }
+
+    speechRecognizer = new SpeechRecognition();
+    speechRecognizer.lang = 'vi-VN';
+    speechRecognizer.continuous = false;
+    speechRecognizer.interimResults = false;
+
+    if (voiceStatus) {
+        voiceStatus.style.display = 'block';
+        voiceStatus.style.background = '#eff6ff';
+        voiceStatus.style.color = '#1e40af';
+        voiceStatus.innerHTML = '🎙️ <b>Bác đang nói...</b> Hãy đọc triệu chứng (ví dụ: <i>cháy chóp lá, đốm mắt én, rầy nâu ở gốc</i>)';
+    }
+    if (btn) { btn.textContent = '⏹️ Dừng'; btn.style.background = '#ef4444'; }
+    isRecognizing = true;
+
+    speechRecognizer.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        if (noteInput) {
+            noteInput.value = (noteInput.value ? noteInput.value + '; ' : '') + transcript;
+        }
+        analyzeVoiceSymptom(transcript);
+    };
+
+    speechRecognizer.onerror = function(event) {
+        if (voiceStatus) {
+            voiceStatus.innerHTML = '⚠️ Chưa nghe rõ âm thanh (' + (event.error || 'thử lại') + '). Bác hãy bấm Nói lại lần nữa.';
+        }
+        isRecognizing = false;
+        if (btn) { btn.textContent = '🎙️ Nói'; btn.style.background = '#2563eb'; }
+    };
+
+    speechRecognizer.onend = function() {
+        isRecognizing = false;
+        if (btn) { btn.textContent = '🎙️ Nói'; btn.style.background = '#2563eb'; }
+    };
+
+    try {
+        speechRecognizer.start();
+    } catch(e) {
+        console.warn("Speech start error:", e);
+    }
+};
+
+function analyzeVoiceSymptom(text) {
+    const t = text.toLowerCase();
+    const voiceStatus = document.getElementById('voiceStatus');
+    let advice = "";
+
+    if (t.includes('mắt én') || t.includes('đạo ôn') || t.includes('hình thoi') || t.includes('cháy lá')) {
+        advice = "💡 <b>AI nhận diện từ giọng nói:</b> Có dấu hiệu <b>Bệnh Đạo Ôn</b>. Lưu ý ngưng bón đạm, thăm chóp lá cờ!";
+    } else if (t.includes('khô vằn') || t.includes('bẹ lá') || t.includes('da hổ')) {
+        advice = "💡 <b>AI nhận diện:</b> Triệu chứng <b>Bệnh Khô Vằn</b> ở bẹ lá sát mặt nước. Giữ nước ngập vừa phải.";
+    } else if (t.includes('đốm nâu') || t.includes('hạt cau')) {
+        advice = "💡 <b>AI nhận diện:</b> Dấu hiệu <b>Đốm Nâu</b> thường do thiếu dinh dưỡng hoặc đất phèn.";
+    } else if (t.includes('bạc lá') || t.includes('cháy mép') || t.includes('vi khuẩn')) {
+        advice = "💡 <b>AI nhận diện:</b> Triệu chứng <b>Bạc Lá (Cháy bìa lá do vi khuẩn)</b>, dễ lây theo nước mưa.";
+    } else if (t.includes('rầy') || t.includes('vàng lùn') || t.includes('lúa cỏ')) {
+        advice = "💡 <b>AI nhận diện:</b> Nguy cơ <b>Rầy Nâu / Bệnh Vàng Lùn</b>. Hãy vạch sát gốc lúa kiểm tra rầy cám!";
+    } else if (t.includes('đen rễ') || t.includes('thối rễ') || t.includes('hữu cơ')) {
+        advice = "💡 <b>AI nhận diện:</b> Dấu hiệu <b>Ngộ độc hữu cơ / Nghẹt rễ</b> do rơm rạ mục yếm khí. Hãy thay nước ngay!";
+    }
+
+    if (voiceStatus) {
+        if (advice) {
+            voiceStatus.style.background = '#fef3c7';
+            voiceStatus.style.color = '#92400e';
+            voiceStatus.innerHTML = `✅ <i>"${text}"</i><br>${advice}`;
+        } else {
+            voiceStatus.style.background = '#f0fdf4';
+            voiceStatus.style.color = '#166534';
+            voiceStatus.innerHTML = `✅ Đã ghi nhận: <i>"${text}"</i>`;
+        }
+    }
+}
+
+// 4. Giọng Nói Đọc To Khuyến Cáo (Speech Synthesis Text-To-Speech)
+window.speakAdvice = function(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const clean = text.replace(/<[^>]*>?/gm, '').replace(/•/g, ', ');
+        const u = new SpeechSynthesisUtterance(clean);
+        u.lang = 'vi-VN';
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+    } else {
+        alert("Trình duyệt không hỗ trợ phát âm thanh giọng đọc.");
+    }
+};
+
+// 5. Radar Gió & Cảnh Báo Lây Lan Dịch Tễ Liên Hộ (Neighborhood Wind Vector Radar)
+let windLayerGroup = L.layerGroup().addTo(map);
+let windRadarActive = false;
+let currentWind = { speed: 15, deg: 45, text: "Đông Bắc" };
+
+function getWindCone(lat, lng, distKm, bearingDeg, spreadAngleDeg = 45) {
+    const pts = [[lat, lng]];
+    const startAngle = bearingDeg - spreadAngleDeg / 2;
+    const endAngle = bearingDeg + spreadAngleDeg / 2;
+    const steps = 12;
+    for (let i = 0; i <= steps; i++) {
+        const rad = (startAngle + (endAngle - startAngle) * (i / steps)) * Math.PI / 180;
+        const dLat = (distKm / 111) * Math.cos(rad);
+        const dLng = (distKm / (111 * Math.cos(lat * Math.PI / 180))) * Math.sin(rad);
+        pts.push([lat + dLat, lng + dLng]);
+    }
+    return pts;
+}
+
+window.toggleWindRadar = function() {
+    windRadarActive = !windRadarActive;
+    windLayerGroup.clearLayers();
+    const btn = document.getElementById('btnWindRadar');
+    
+    if (!windRadarActive) {
+        if (btn) { btn.style.background = '#fff'; btn.style.color = 'inherit'; }
+        return;
+    }
+    
+    if (btn) { btn.style.background = '#3b82f6'; btn.style.color = '#fff'; }
+
+    const center = map.getCenter();
+    // Gọi Open-Meteo lấy gió thật theo tọa độ bản đồ
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${center.lat.toFixed(4)}&longitude=${center.lng.toFixed(4)}&current_weather=true`)
+        .then(r => r.json())
+        .then(wd => {
+            if (wd && wd.current_weather) {
+                currentWind.speed = wd.current_weather.windspeed;
+                currentWind.deg = wd.current_weather.winddirection;
+            }
+            renderWindOverlay();
+        })
+        .catch(e => {
+            console.log("Dùng gió vi khí hậu mặc định:", e);
+            renderWindOverlay();
+        });
+};
+
+function renderWindOverlay() {
+    windLayerGroup.clearLayers();
+    // Gió thổi TỪ góc deg nên hướng phát tán sâu bệnh là (deg + 180) % 360
+    const blowToDeg = (currentWind.deg + 180) % 360;
+    const redPoints = data.filter(x => x.s === 'red');
+
+    if (redPoints.length === 0) {
+        alert("Hiện tại không có điểm dịch đỏ nào trên bản đồ để dựng quạt phát tán gió.");
+        return;
+    }
+
+    redPoints.forEach(p => {
+        const cone = getWindCone(p.lat, p.lng, 0.9, blowToDeg, 50);
+        const poly = L.polygon(cone, {
+            color: '#dc2626',
+            weight: 2,
+            fillColor: '#ef4444',
+            fillOpacity: 0.28,
+            dashArray: '5, 5'
+        }).addTo(windLayerGroup);
+
+        poly.bindPopup(`
+            <div style="font-size:11px;min-width:180px">
+                <b style="color:#dc2626">⚠️ VÙNG PHÁT TÁN XUÔI GIÓ</b><br>
+                Ổ bệnh: <b>${p.f} · ${p.d}</b><br>
+                Gió: <b>${currentWind.speed} km/h</b> (Hướng ${blowToDeg.toFixed(0)}°)<br>
+                <div style="margin-top:6px;background:#fef2f2;padding:6px;border-radius:6px;color:#991b1b">
+                    Bà con có ruộng trong vùng nón 900m này cần vạch lá kiểm tra mé ruộng đón gió ngay!
+                </div>
+            </div>
+        `);
+    });
+
+    alert(`🧭 Radar dịch tễ đã bật:
+- Tốc độ gió: ${currentWind.speed} km/h
+- Hướng dịch phát tán: ${blowToDeg.toFixed(0)}°
+- Đã khoanh vùng bảo vệ cho ${redPoints.length} ổ bệnh.`);
+}
+
+// 6. Dược thư & Kê Đơn Kinh Tế Thông Minh
+const PRESCRIPTIONS = {
+    'fungal_dao_on': {
+        eco: 'Tricyclazole 75% WP (Beam, Bump...) — Giá rẻ ~30.000đ - 35.000đ/bình 25L',
+        pro: 'Fenoxanil + Isoprothiolane (Fuji-one, Filia...) — Đặc trị dứt điểm ~60.000đ/bình 25L',
+        phi: '14 ngày (Ngưng xịt trước thu hoạch)',
+        note: 'Tuyệt đối ngưng bón phân đạm (Ure) và không xịt phân bón lá khi ruộng đang có vết bệnh!'
+    },
+    'fungal_kho_van': {
+        eco: 'Validamycin 3SL / 5SL — Chi phí tiết kiệm ~20.000đ - 25.000đ/bình 25L',
+        pro: 'Hexaconazole (Anvil 5SC) hoặc Azoxystrobin (Amistar Top) ~55.000đ/bình 25L',
+        phi: '7 ngày',
+        note: 'Xịt ướt đều gốc bẹ lá, rút bớt nước trong ruộng để tán thông thoáng.'
+    },
+    'fungal_brown_spot': {
+        eco: 'Mancozeb 80WP hoặc Difenoconazole — ~30.000đ/bình 25L',
+        pro: 'Tebuconazole + Trifloxystrobin (Nativo) ~65.000đ/bình 25L',
+        phi: '10 ngày',
+        note: 'Bổ sung thêm phân Kali và lân nung chảy, tránh để ruộng cạn kiệt thiếu dinh dưỡng.'
+    },
+    'bacterial_bac_la': {
+        eco: 'Kasugamycin (Kasumin) — ~28.000đ/bình 25L',
+        pro: 'Oxolinic acid (Starner) hoặc Bronopol ~60.000đ/bình 25L',
+        phi: '10 ngày',
+        note: 'Vi khuẩn lây theo giọt sương và mưa gió. Phun khi lá khô ráo lúc sáng sớm hoặc chiều mát.'
+    },
+    'viral_grassy_stunt': {
+        eco: 'Pymetrozine (Chess) hoặc Dinotefuran để trừ rầy nâu truyền bệnh ~35.000đ/bình',
+        pro: 'Kết hợp diệt rầy và nhổ bỏ tiêu hủy bụi lúa bệnh tránh lây lan cả ruộng',
+        phi: '14 ngày',
+        note: 'Bệnh do virus nên không có thuốc chữa cây đã nhiễm; mấu chốt là dập tắt rầy nâu môi giới!'
+    },
+    'physio_organic_toxicity': {
+        eco: 'Tháo cạn nước phơi ruộng nứt chân chim 3-5 ngày + Rải vôi bột (20-30kg/công)',
+        pro: 'Bổ sung lân nung chảy hoặc Axit Humic tưới gốc để kích rễ mới trắng lại',
+        phi: 'Không cách ly hóa chất (Rối loạn sinh lý)',
+        note: 'Không xịt thuốc sâu rầy lúc này; rễ đang nghẹt xịt hóa chất cây càng suy kiệt nặng!'
+    }
+};
+
+// 7. Chia Sẻ 1-Chạm Qua Zalo Cho Khuyến Nông Xã
+window.shareToZalo = function(field, disease, age, stage, lat, lng) {
+    const text = `🌾 BÁO CÁO BỆNH CÂY LÚA - AI RICE 4.0\n` +
+                 `• Khu vực: Ruộng ${field}\n` +
+                 `• Tuổi lúa: ${age} ngày (${stage})\n` +
+                 `• AI Nhận diện: ${disease}\n` +
+                 `• Tọa độ GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}\n` +
+                 `• Bản đồ: https://maps.google.com/?q=${lat},${lng}\n` +
+                 `Nhờ Kỹ sư Khuyến nông tư vấn giúp biện pháp xử lý an toàn!`;
+                 
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        alert("✅ Đã sao chép nội dung báo cáo! Đang mở Zalo để bác dán gửi cho Cán bộ Khuyến nông hoặc Đại lý thuốc.");
+    }
+    window.open("https://zalo.me/", "_blank");
+};
+
+</script>
+<script src="./tests/map_smoke_test.js"></script></body></html>
+
+<script src="./src/data/services.js"></script><script src="./map_centric.js"></script><script src="./src/v4_workflow.js"></script>
+
+
+
+

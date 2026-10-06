@@ -1,0 +1,44 @@
+<script>
+
+const SUPABASE_URL = 'https://yhrlrzwsoqgryocrurms.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_g8-aXuPxQ-1LC_j5bWVrZg_l0ezxAT8';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadData() {
+  try {
+    const { data: records, error } = await supabase.from('inspections').select('*').order('created_at', { ascending: false });
+    if (records && records.length > 0) {
+      data = records.map(r => ({
+        db_id: r.id,
+        f: r.field_name,
+        s: r.status_color,
+        d: r.disease_name,
+        id: r.disease_id,
+        c: r.confidence,
+        a: r.age_days,
+        g: r.growth_stage,
+        t: r.created_at,
+        lat: r.latitude,
+        lng: r.longitude,
+        job_id: r.job_id,
+        location_source: r.location_source,
+        provider: r.ai_provider
+      }));
+    }
+    render();
+  } catch(e) {
+    console.error("Lỗi lấy dữ liệu Supabase:", e);
+    render();
+  }
+}
+// Load data from DB when app starts
+loadData();
+
+const CAYLUA_CONFIG = {
+    aiMode: "auto",
+    server: { enabled: true, baseUrl: "http://localhost:8000", healthPath: "/health", analyzePath: "/analyze_mobile", timeoutMs: 3500 },
+    plantnet: { enabled: true, apiKey: "", diseaseEndpoint: "https://my-api.plantnet.org/v2/identify/all" },
+    local: { enabled: false }
+};
+
+const DISEASES=[{"id":"fungal_dao_on","name_vi":"Bệnh đạo ôn","name_en":"Rice blast","group":"Nấm","causal_agent":"Pyricularia oryzae","target_organs":["lá","đốt thân","cổ

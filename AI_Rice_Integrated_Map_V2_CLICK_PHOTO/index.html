@@ -1,0 +1,109 @@
+<!doctype html><html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Rice — Bản đồ sức khỏe ruộng lúa</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:system-ui,Arial;background:#f4f7f5;color:#17202a}
+.app{height:100%;display:grid;grid-template-columns:380px 1fr}.side{overflow:auto;background:#fff;padding:14px;border-right:1px solid #ddd}
+.brand{font-size:20px;font-weight:700;margin-bottom:12px}.sub{font-size:12px;color:#667085;font-weight:400}
+.card{border:1px solid #e3e7e4;border-radius:13px;padding:12px;margin-bottom:10px;background:#fff}
+h2{font-size:14px;margin:0 0 9px}label{font-size:12px;color:#475467;display:block;margin:6px 0 3px}
+input,select,button{font:inherit}input,select{width:100%;padding:8px;border:1px solid #d0d5dd;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}button{border:0;border-radius:8px;padding:8px 10px;cursor:pointer}
+.primary{width:100%;background:#16a34a;color:#fff;font-weight:700;margin-top:9px}.secondary{background:#eef2f0}
+.lock{margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;padding:8px;border-radius:8px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.stat{text-align:center;background:#f8faf9;padding:8px;border-radius:8px}.stat b{display:block;font-size:18px}.stat span{font-size:10px;color:#667085}
+.item{display:grid;grid-template-columns:55px 1fr auto;gap:7px;align-items:center;border:1px solid #e5e7eb;border-radius:9px;padding:7px;margin-top:7px;cursor:pointer}
+.thumb{width:55px;height:55px;object-fit:cover;border-radius:7px;background:#eee}.title{font-size:12px;font-weight:700}.meta{font-size:10px;color:#667085;line-height:1.45}
+.badge{font-size:9px;padding:4px 6px;border-radius:20px;background:#dcfce7;color:#166534}.empty{font-size:12px;color:#667085;text-align:center;padding:10px}
+.map{position:relative}#map{height:100%;width:100%;background:#eef1f4}.tools{position:absolute;z-index:1000;top:12px;right:12px;background:#fff;padding:8px;border-radius:10px;box-shadow:0 2px 12px #0002}.tools button{border:1px solid #ddd;background:#fff;margin:2px}.tools .on{background:#dcfce7;border-color:#86efac}
+.legend{position:absolute;z-index:900;right:12px;bottom:15px;background:#fff;padding:8px;border-radius:9px;font-size:10px;box-shadow:0 2px 12px #0002}
+@media(max-width:850px){.app{grid-template-columns:1fr;grid-template-rows:52% 48%}.map{grid-row:1}.side{grid-row:2;border-right:0;border-top:1px solid #ddd}}
+</style>
+<style>
+.click-hint{position:absolute;z-index:1001;left:12px;bottom:15px;background:#fff;padding:8px 10px;border-radius:9px;
+box-shadow:0 2px 12px #0002;font-size:11px}
+</style>
+</head><body>
+<div class="app"><aside class="side">
+<div class="brand">🌾 AI Rice<div class="sub">Bản đồ sức khỏe ruộng lúa</div></div>
+<div class="card"><h2>📷 Tạo lần kiểm tra</h2>
+<label>Ảnh ruộng / lá lúa</label>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+  <button type="button" class="secondary" onclick="document.getElementById('uploadPhoto').click()">📁 Up ảnh</button>
+  <button type="button" class="secondary" onclick="document.getElementById('cameraPhoto').click()">📷 Chụp ảnh</button>
+</div>
+<input id="uploadPhoto" type="file" accept="image/*" style="display:none" onchange="selectPhoto(this)">
+<input id="cameraPhoto" type="file" accept="image/*" capture="environment" style="display:none" onchange="selectPhoto(this)">
+<div id="photoName" style="font-size:11px;color:#667085;margin-top:6px">Chưa chọn ảnh</div>
+<img id="photoPreview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:9px;margin-top:7px">
+<div class="grid"><div><label>Vụ / mùa</label><input id="crop" placeholder="Đông Xuân"></div><div><label>Tuổi lúa</label><input id="age" type="number" min="0" placeholder="35"></div></div>
+<label>Giai đoạn sinh trưởng</label><select id="stage"><option>Chưa chọn</option><option>Mạ</option><option>Đẻ nhánh</option><option>Làm đòng</option><option>Trổ</option><option>Chín sữa</option><option>Chín</option></select>
+<div style="font-size:12px;margin-top:8px">
+  <span id="gps">Chưa chọn vị trí</span>
+  <button class="secondary" onclick="gps()">📍 Lấy GPS</button>
+</div>
+<div style="font-size:11px;color:#667085;margin-top:5px">💡 Hoặc <b>bấm trực tiếp lên bản đồ</b> để chọn vị trí ruộng.</div>
+<label>Ghi chú</label><input id="note" placeholder="VD: lá vàng, có đốm">
+<button class="primary" onclick="save()">💾 Lưu lần kiểm tra</button>
+<div class="lock">🔒 <b>AI nhận diện đang khóa.</b> Ảnh, GPS, thời gian và lịch sử vẫn hoạt động. Sau này sẽ nối server YOLOv8 hiện tại.</div>
+</div>
+<div class="card"><h2>📊 Tổng quan</h2><div class="stats"><div class="stat"><b id="n">0</b><span>Lần kiểm tra</span></div><div class="stat"><b id="d">0</b><span>Có bệnh</span></div><div class="stat"><b id="p">0</b><span>Vị trí</span></div></div></div>
+<div class="card"><h2>🗂️ Lịch sử</h2><div id="history" class="empty">Chưa có dữ liệu.</div><button style="width:100%;margin-top:8px;background:#fee2e2;color:#991b1b" onclick="clearAll()">Xóa dữ liệu thử nghiệm</button></div>
+</aside>
+<main class="map"><div id="map"></div><div class="click-hint">📍 Bấm vào bản đồ để chọn vị trí ruộng</div><div class="tools"><button id="rb" class="on" onclick="roadMode()">🛣️ Đường</button><button id="sb" onclick="satMode()">🛰️ Vệ tinh</button><button onclick="gps(true)">📍 Vị trí tôi</button></div><div class="legend">🟢 Bình thường<br>🟡 Cần theo dõi<br>🔴 Có bệnh</div></main></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+const map=L.map('map').setView([10.0452,105.7469],13);
+const road=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Source: Esri, OpenStreetMap contributors, GIS User Community'}).addTo(map);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and others'});
+let pos=null,ms=[],selectedMarker=null,selectedPhoto=null;
+map.on('click', e=>{
+  pos=[e.latlng.lat,e.latlng.lng];
+  document.getElementById('gps').textContent=`Đã chọn trên bản đồ: ${pos[0].toFixed(6)}, ${pos[1].toFixed(6)}`;
+  if(selectedMarker) map.removeLayer(selectedMarker);
+  selectedMarker=L.marker(pos,{draggable:true}).addTo(map)
+    .bindPopup('<b>📍 Vị trí ruộng đã chọn</b><br>'+pos[0].toFixed(6)+', '+pos[1].toFixed(6)+'<br><small>Có thể kéo marker để chỉnh vị trí.</small>')
+    .openPopup();
+  selectedMarker.on('dragend', ev=>{
+    const q=ev.target.getLatLng();
+    pos=[q.lat,q.lng];
+    document.getElementById('gps').textContent=`Đã chọn vị trí: ${pos[0].toFixed(6)}, ${pos[1].toFixed(6)}`;
+  });
+});
+
+function roadMode(){if(map.hasLayer(sat))map.removeLayer(sat);road.addTo(map);rb.classList.add('on');sb.classList.remove('on')}
+function satMode(){if(map.hasLayer(road))map.removeLayer(road);sat.addTo(map);sb.classList.add('on');rb.classList.remove('on')}
+function gps(center=false){
+navigator.geolocation.getCurrentPosition(x=>{
+ pos=[x.coords.latitude,x.coords.longitude];
+ document.getElementById('gps').textContent=`GPS: ${pos[0].toFixed(6)}, ${pos[1].toFixed(6)}`;
+ if(selectedMarker) map.removeLayer(selectedMarker);
+ selectedMarker=L.marker(pos,{draggable:true}).addTo(map).bindPopup('📍 Vị trí GPS hiện tại<br>'+pos[0].toFixed(6)+', '+pos[1].toFixed(6)).openPopup();
+ selectedMarker.on('dragend',ev=>{const q=ev.target.getLatLng();pos=[q.lat,q.lng];document.getElementById('gps').textContent=`Đã chọn vị trí: ${pos[0].toFixed(6)}, ${pos[1].toFixed(6)}`});
+ if(center)map.setView(pos,17);
+},e=>alert('Không lấy được GPS: '+e.message),{enableHighAccuracy:true,timeout:10000})}
+function selectPhoto(input){
+ const file=input.files && input.files[0];
+ if(!file) return;
+ selectedPhoto=file;
+ document.getElementById('photoName').textContent='Đã chọn: '+file.name;
+ const url=URL.createObjectURL(file);
+ const img=document.getElementById('photoPreview');
+ img.src=url; img.style.display='block';
+ // Keep the two input controls synchronized conceptually; save() reads selectedPhoto.
+}
+function data(){return JSON.parse(localStorage.getItem('ai_rice_records')||'[]')}
+function put(a){localStorage.setItem('ai_rice_records',JSON.stringify(a))}
+function image(file){return new Promise((ok,no)=>{if(!file)return ok('');let r=new FileReader();r.onload=()=>{let i=new Image();i.onload=()=>{let s=Math.min(1,800/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.75))};i.src=r.result};r.readAsDataURL(file)})}
+async function save(){if(!pos){alert('Hãy bấm trực tiếp lên bản đồ hoặc lấy GPS trước khi lưu.');return}let a=data(),photo=await image(selectedPhoto);a.unshift({id:Date.now(),ts:Date.now(),lat:pos[0],lng:pos[1],photo,crop:crop.value,age:age.value,stage:stage.value,note:note.value,status:'normal',disease:'Chưa phân tích AI'});put(a);render();map.setView(pos,17);
+if(selectedMarker){map.removeLayer(selectedMarker);selectedMarker=null}
+selectedPhoto=null;
+document.getElementById('uploadPhoto').value='';
+document.getElementById('cameraPhoto').value='';
+document.getElementById('photoName').textContent='Chưa chọn ảnh';
+document.getElementById('photoPreview').style.display='none';
+alert('Đã lưu điểm kiểm tra.')}
+function render(){let a=data();n.textContent=a.length;d.textContent=a.filter(x=>x.status==='disease').length;p.textContent=new Set(a.map(x=>x.lat.toFixed(5)+','+x.lng.toFixed(5))).size;ms.forEach(x=>map.removeLayer(x));ms=[];let h=document.getElementById('history');h.innerHTML='';if(!a.length){h.className='empty';h.textContent='Chưa có dữ liệu.';return}h.className='';a.slice(0,30).forEach(x=>{let color=x.status==='disease'?'#dc2626':x.status==='follow'?'#eab308':'#16a34a',m=L.circleMarker([x.lat,x.lng],{radius:10,color:'#fff',weight:2,fillColor:color,fillOpacity:.95}).addTo(map);m.bindPopup((x.photo?`<img src="${x.photo}" style="width:170px;height:110px;object-fit:cover;border-radius:7px"><br>`:'')+`<b>🌾 ${x.disease}</b><br>${x.crop||'Chưa ghi vụ'} · ${x.age||'?'} ngày<br>${x.stage}<br>${new Date(x.ts).toLocaleString('vi-VN')}<br>GPS: ${x.lat.toFixed(6)}, ${x.lng.toFixed(6)}<br>${x.note||''}`);ms.push(m);let e=document.createElement('div');e.className='item';e.innerHTML=`<img class="thumb" src="${x.photo||''}"><div><div class="title">${x.disease}</div><div class="meta">${x.crop||'Chưa ghi vụ'} · ${x.age||'?'} ngày<br>${new Date(x.ts).toLocaleString('vi-VN')}<br>${x.lat.toFixed(5)}, ${x.lng.toFixed(5)}</div></div><span class="badge">CHƯA BỆNH</span>`;e.onclick=()=>map.setView([x.lat,x.lng],17);h.appendChild(e)})}
+function clearAll(){if(confirm('Xóa toàn bộ dữ liệu thử nghiệm?')){localStorage.removeItem('ai_rice_records');render()}} render();
+</script></body></html>
